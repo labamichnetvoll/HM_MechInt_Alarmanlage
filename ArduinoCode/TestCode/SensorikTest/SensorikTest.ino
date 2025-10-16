@@ -1,9 +1,18 @@
-void setup() {
-  // put your setup code here, to run once:
+#include "Ultrasonic.h"
 
+#define ULTRASONIC_PIN_NR 7
+
+Ultrasonic ultrasonic(ULTRASONIC_PIN_NR);
+
+void setup() {
+  Serial.begin(9600);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  long RangeInCentimeters;
 
+  RangeInCentimeters = ultrasonic.MeasureInCentimeters();
+  Serial.print(RangeInCentimeters);
+  Serial.println(" cm");
+  delay(250);
 }
