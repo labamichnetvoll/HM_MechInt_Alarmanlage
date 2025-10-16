@@ -102,3 +102,8 @@ fp-info-cache
 
 # Local project settings
 *.kicad_prl
+
+# VSCode & build files
+/.vscode
+/build
+log*.txt
