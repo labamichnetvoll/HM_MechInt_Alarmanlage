@@ -1,14 +1,14 @@
-Programmlogik 
+# Programmlogik 
 
 ---------------------------------------------------------
-ANSCHALTEN
+## ANSCHALTEN
 
 Wenn Wippschalter == 1
    dann Powerbank AKTIV schalten 
    und in Web-App "BEREIT" anzeigen
 
 ---------------------------------------------------------
-MODUSWECHSELN
+## MODUSWECHSELN
 
 Wenn Drucktaster 1x betätigt == Modus "Raum"
    dann warte 10 Sekunden              // damit man Raum verlassen kann
@@ -25,7 +25,7 @@ Wenn Drucktaster 3x betätigt == Aus
    und in Web-App "BEREIT" anzeigen
 
 ---------------------------------------------------------
-ALARM
+## ALARM
 
 Wenn Sensor ausgelöst        
    dann LED an
@@ -35,7 +35,7 @@ Wenn Sensor ausgelöst
       und in Web-App "ALARM!!!" anzeigen
 
 ---------------------------------------------------------
-AUSSCHALTEN
+## AUSSCHALTEN
 
 Wenn Wippschalter == 0                // brauchen wir hier noch eine Absicherung, dass nicht der Einbrecher einfach schnell genug ausschaltet? 
    dann Powerbank ausschalten
