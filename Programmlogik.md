@@ -20,7 +20,7 @@ Wenn Drucktaster 3x betätigt      // entspricht Modus "Modus wählen"
    dann in Web-App "MODUS WÄHLEN" anzeigen
 
 ---------------------------------------------------------
-## ALARM AKTIV SCHALTEN
+## ALARMMODUS AKTIVIEREN
 
 Wenn Überwachung aktiv == 1             // in Web-App schalten
    dann in Web-App "STARTE ÜBERWACHUNG" anzeigen
