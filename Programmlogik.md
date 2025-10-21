@@ -1,42 +1,61 @@
 # Programmlogik 
 
 ---------------------------------------------------------
-## ANSCHALTEN
+## GERÄT ÜBER HAUPTSCHALTER ANSCHALTEN
 
 Wenn Wippschalter == 1
-   dann Powerbank AKTIV schalten 
-   und in Web-App "BEREIT" anzeigen
+   dann Powerbank auf high schalten 
+   und in Web-App "MODUS WÄHLEN" anzeigen
 
 ---------------------------------------------------------
 ## MODUSWECHSELN
 
-Wenn Drucktaster 1x betätigt == Modus "Raum"
-   dann warte 10 Sekunden              // damit man Raum verlassen kann
-      dann aktiviere Bewegungsmelder
-      und in Web-App "RAUMCHECK AKTIV" anzeigen
+Wenn Drucktaster 1x betätigt       // entspricht Modus "Raum"
+   dann in Web-App "RAUMCHECK" anzeigen
 
-Wenn Drucktaster 2x betätigt == Modus "Gepäck" 
-   dann warte 3 Sekunden              // um einen Alarm zu vermeiden, falls man beim Weggehen ans Gepäck stößt
-      dann aktiviere Beschleunigungssensor
-      und in Web-App "GEPÄCKCHECK AKTIV" anzeigen
+Wenn Drucktaster 2x betätigt       // entspricht Modus "Gepäck" 
+   dann in Web-App "GEPÄCKCHECK" anzeigen
 
-Wenn Drucktaster 3x betätigt == Aus
-   dann deaktiviere alle Sensoren
-   und in Web-App "BEREIT" anzeigen
+Wenn Drucktaster 3x betätigt      // entspricht Modus "Modus wählen"
+   dann in Web-App "MODUS WÄHLEN" anzeigen
 
 ---------------------------------------------------------
-## ALARM
+## ALARM AKTIV SCHALTEN
+
+Wenn Überwachung aktiv == 1             // in Web-App schalten
+   dann in Web-App "STARTE ÜBERWACHUNG" anzeigen
+   und warte 5 Sekunden
+      wenn Modus "GEPÄCKCHECK" == 1
+          dann aktiviere Beschleunigungssensor
+          und in Web-App "GEPÄCKCHECK AKTIV" anzeigen
+      wenn Modus "RAUMCHECK" == 1
+          dann aktiviere Bewegungssensor
+          und in Web-App "RAUMCHECK AKTIV" anzeigen
+
+---------------------------------------------------------
+## ALARMMODUS DEAKTIVIEREN
+
+Wenn Überwachung aktiv == 0           // in Web-App schalten
+    dann in Web-App "BEENDE ÜBERWACHUNG" anzeigen
+    und warte 5 Sekunden
+       wenn Überwachung aktiv == 1
+          break;
+       wenn Überwachug aktiv == 0
+          dann deaktiviere alle Sensoren
+          und in Web-App "MODUS WÄHLEN" anzeigen
+       
+---------------------------------------------------------
+## ALARMZUSTAND
 
 Wenn Sensor ausgelöst        
    dann LED an
-   dann warte 5 Sekunden       // falls man selbst in den Raum zurückkommt, damit man noch Zeit hat, das Gerät zu deaktivieren.
-      dann Lautsprecher an
-      und Buzzer an
-      und in Web-App "ALARM!!!" anzeigen
+   und Lautsprecher an
+   und Buzzer an
+   und in Web-App "ALARM!!!" anzeigen
 
 ---------------------------------------------------------
-## AUSSCHALTEN
+## GERÄT ÜBER HAUPTSCHALTER AUSSCHALTEN
 
-Wenn Wippschalter == 0                // brauchen wir hier noch eine Absicherung, dass nicht der Einbrecher einfach schnell genug ausschaltet? 
-   dann Powerbank ausschalten
+Wenn Wippschalter == 0                // wichtig: hardwareseitig Schalter "verstecken", um Manipulation zu erschweren
+   dann Powerbank auf low schalten
    und in Web-App "AUS" anzeigen
