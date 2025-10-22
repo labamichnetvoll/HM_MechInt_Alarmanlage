@@ -12,6 +12,7 @@ Folgende Unterordner sind geplant:
 - `main`: Hier werden alle Änderungen nach und nach eingebettet
 - `DEV_Sensorik`: Entwicklungsbranch für die Sensorik-Programmierung
 - `Leoline99-patch-1`: Programlogik
+- `dev_Schaltplan`: Schaltplan Erstellung mit KiCAD v9.0.5
 - `doku_github`: Dokumentation auf GitHub (z.B. Strukturerläuterung, usw..)
 
 > [!TIP]
