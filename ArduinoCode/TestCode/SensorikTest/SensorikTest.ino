@@ -1,6 +1,6 @@
 #include "Ultrasonic.h"
 
-#define ULTRASONIC_PIN_NR 7
+#define ULTRASONIC_PIN_NR 7        // Pin Nummer 7
 
 Ultrasonic ultrasonic(ULTRASONIC_PIN_NR);
 
