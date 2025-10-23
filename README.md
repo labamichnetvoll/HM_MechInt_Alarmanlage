@@ -27,6 +27,7 @@ Folgende Unterordner sind geplant:
 > Diese müssen von mind. einer weiteren Person bestätigt & kommentiert werden, bevor diese in den `main`-branch gemerged werden können.
 
 ## FAQ
-Bei Fragen, Anmerkungen oder Verbesserungsvorschlägen an @labamichnetvoll (Florian) wenden
+1. Bei Fragen, Anmerkungen oder Verbesserungsvorschlägen an @labamichnetvoll (Florian) wenden
+2. **[Markdown Syntax](https://docs.github.com/de/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#quoting-text)**
 
 
