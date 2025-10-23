@@ -1,4 +1,4 @@
-#include "Ultrasonic.h"
+#include "Ultrasonic.h"            //fertige Bibliothek für Ultraschall Sensor
 
 #define ULTRASONIC_PIN_NR 7        // Pin Nummer 7
 
