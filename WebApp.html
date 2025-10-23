@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Reisealarmanlage Steuerung</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f4ff;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    .status {
+      margin: 20px 0;
+      font-size: 18px;
+    }
+    select, button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 10px;
+      border-radius: 6px;
+    }
+    .alarm {
+      background-color: red;
+      color: white;
+      padding: 15px;
+      font-weight: bold;
+      display: none;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Reisealarmanlage</h1>
+
+  <!-- Statusanzeigen -->
+  <div class="status">
+    <div><strong>Gerätestatus:</strong> <span id="geraetStatus">MODUS WÄHLEN</span></div>
+    <div><strong>Aktueller Modus:</strong> <span id="modusStatus">-</span></div>
+    <div><strong>Überwachung:</strong> <span id="ueberwachungStatus">INAKTIV</span></div>
+  </div>
+
+  <!-- Modusauswahl -->
+  <label for="modus">Modus wählen:</label>
+  <select id="modus" onchange="modusWechseln()">
+    <option value="waehlen">MODUS WÄHLEN</option>
+    <option value="raum">RAUMCHECK</option>
+    <option value="gepaeck">GEPÄCKCHECK</option>
+  </select>
+
+  <!-- Überwachungssteuerung -->
+  <div>
+    <button onclick="starteUeberwachung()">🔒 Starte Überwachung</button>
+    <button onclick="stoppeUeberwachung()">🔓 Beende Überwachung</button>
+  </div>
+
+  <!-- Alarmanzeige -->
+  <div id="alarmBox" class="alarm">🚨 ALARM!!!</div>
+
+  <script>
+    // Zustände speichern
+    let modus = "waehlen";
+    let ueberwachungAktiv = false;
+
+    function modusWechseln() {
+      modus = document.getElementById("modus").value;
+
+      // Anzeige aktualisieren
+      document.getElementById("modusStatus").innerText = modus.toUpperCase();
+
+      // Optional: an Arduino senden
+      fetch("/modus?typ=" + modus);
+
+      // Gerätestatus ändern
+      document.getElementById("geraetStatus").innerText =
+        modus === "waehlen" ? "MODUS WÄHLEN" : modus.toUpperCase() + " AKTIV";
+    }
+
+    function starteUeberwachung() {
+      ueberwachungAktiv = true;
+      document.getElementById("ueberwachungStatus").innerText = "AKTIV";
+      fetch("/start");
+
+      // Optional: 5 Sekunden warten oder Animation anzeigen
+      alert("Überwachung gestartet für " + modus.toUpperCase());
+    }
+
+    function stoppeUeberwachung() {
+      ueberwachungAktiv = false;
+      document.getElementById("ueberwachungStatus").innerText = "INAKTIV";
+      fetch("/stop");
+
+      // Gerätestatus zurücksetzen
+      document.getElementById("geraetStatus").innerText = "MODUS WÄHLEN";
+    }
+
+    // Beispiel: Alarm auslösen (dieser Teil wird normalerweise vom Gerät getriggert)
+    function alarmAusloesen() {
+      document.getElementById("alarmBox").style.display = "block";
+    }
+
+    // Beispiel: Alarm beenden
+    function alarmZuruecksetzen() {
+      document.getElementById("alarmBox").style.display = "none";
+    }
+
+    // Du kannst später auch über fetch('/alarm') oder WebSocket Alarmzustand anzeigen lassen
+  </script>
+</body>
+</html>
