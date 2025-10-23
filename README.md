@@ -35,8 +35,8 @@ Alles wichtige ist hier zu beziehen:
 
 > [!IMPORTANT]
 > Mit dependency installieren!
-- AdafruitGFX Library                               *Für O-LED*
-- Adafruit SSD1306                                  *Für O-LED*
-- Grove Ultrasonic Ranger by Seeed Studio           *Für Ultraschallsensor*
+- AdafruitGFX Library &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Für O-LED*
+- Adafruit SSD1306    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Für O-LED*
+- Grove Ultrasonic Ranger by Seeed Studio    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Für Ultraschallsensor*
 - *evtl noch etwas für Lautsprecher*
 
