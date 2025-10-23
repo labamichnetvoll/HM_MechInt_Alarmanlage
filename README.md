@@ -15,7 +15,7 @@ Folgende Unterordner sind geplant:
 | `main`                | Hier werden alle Änderungen nach und nach eingebettet         |
 | `DEV_Sensorik`        | Entwicklungsbranch für die Sensorik-Programmierung            |
 | `Leoline99-patch-2`   | Programlogik                                                  |
-| `dev_Schaltplan`      | Schaltplan Erstellung mit KiCAD v9.0.5                        |
+| `dev_Schaltplan`      | Schaltplan Erstellung mit KiCAD v9.0.5 als Bauanleitung       |
 | `dev_WebApp`          | WebUI Entwicklung & Arduino "Backend"                         |
 | `doku_github`         | Dokumentation auf GitHub (z.B. Strukturerläuterung, usw..)    |
 
@@ -30,4 +30,12 @@ Folgende Unterordner sind geplant:
 1. Bei Fragen, Anmerkungen oder Verbesserungsvorschlägen an @labamichnetvoll (Florian) wenden
 2. **[Markdown Syntax](https://docs.github.com/de/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)**
 
+## Biblotheken Arduino IDE
+Alles wichtige ist hier zu beziehen:
+
+**Mit dependency installieren!**
+- AdafruitGFX Library                               *Für O-LED*
+- Adafruit SSD1306                                  *Für O-LED*
+- Grove Ultrasonic Ranger by Seeed Studio           *Für Ultraschallsensor*
+- *evtl noch etwas für Lautsprecher*
 
