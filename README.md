@@ -32,7 +32,8 @@ Bei Fragen, Anmerkungen oder Verbesserungsvorschlägen an @labamichnetvoll (Flor
 ## Biblotheken Arduino IDE
 Alles wichtige ist hier zu beziehen:
 
-**Mit dependency installieren!**
+> [!IMPORTANT]
+> Mit dependency installieren!
 - AdafruitGFX Library                               *Für O-LED*
 - Adafruit SSD1306                                  *Für O-LED*
 - Grove Ultrasonic Ranger by Seeed Studio           *Für Ultraschallsensor*
