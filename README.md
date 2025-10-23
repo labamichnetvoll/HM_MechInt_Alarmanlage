@@ -29,5 +29,12 @@ Folgende Unterordner sind geplant:
 ## FAQ
 Bei Fragen, Anmerkungen oder Verbesserungsvorschlägen an @labamichnetvoll (Florian) wenden
 
+## Biblotheken Arduino IDE
+Alles wichtige ist hier zu beziehen:
 
+**Mit dependency installieren!**
+- AdafruitGFX Library                               *Für O-LED*
+- Adafruit SSD1306                                  *Für O-LED*
+- Grove Ultrasonic Ranger by Seeed Studio           *Für Ultraschallsensor*
+- *evtl noch etwas für Lautsprecher*
 
