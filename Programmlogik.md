@@ -5,52 +5,87 @@
 
 Wenn Wippschalter == 1
    dann Powerbank auf high schalten 
-   und in Web-App "MODUS WÄHLEN" anzeigen
+   und am Display "MODUS HOTEL" anzeigen          // Modus "Hotel" als Default-Zustand
+   und in Web-App "MODUS HOTEL" anzeigen
 
 ---------------------------------------------------------
 ## MODUSWECHSELN
+// Moduswechsel über Drucktaster oder Web-App möglich
 
-Wenn Drucktaster 1x betätigt       // entspricht Modus "Raum"
-   dann in Web-App "RAUMCHECK" anzeigen
+Wenn Drucktaster 1x kurz betätigt         // max. 1 Sekunde
+   dann Wechsel zwischen Modi:
+      Modus "Gepäck"             // scannt Bewegungen über Beschleunigungssensor auf dem Arduino
+         am Display "MODUS GEPÄCK" anzeigen        
+         und in Web-App "MODUS GEPÄCK" anzeigen
+      Modus "Zelt"               // scannt Eindringen in Zelt über IR-Bewegungssensor
+         am Display "MODUS ZELT" anzeigen        
+         und in Web-App "MODUS ZELT" anzeigen
+      Modus "Hotel"              // scannt anvisierte Tür/Fenster über Ultraschallsensor
+         am Display "MODUS HOTEL" anzeigen        
+         und in Web-App "MODUS HOTEL" anzeigen
 
-Wenn Drucktaster 2x betätigt       // entspricht Modus "Gepäck" 
-   dann in Web-App "GEPÄCKCHECK" anzeigen
+ODER
 
-Wenn Drucktaster 3x betätigt      // entspricht Modus "Modus wählen"
-   dann in Web-App "MODUS WÄHLEN" anzeigen
+Wenn Auswahl in Web-App == Modus "Gepäck"
+   am Display "MODUS GEPÄCK" anzeigen        
+   und in Web-App "MODUS GEPÄCK" anzeigen
+Wenn Auswahl in Web-App == Modus "Zelt"          
+   am Display "MODUS ZELT" anzeigen        
+   und in Web-App "MODUS ZELT" anzeigen
+Wenn Auswahl in Web-App == Modus "Hotel"         
+   am Display "MODUS HOTEL" anzeigen        
+   und in Web-App "MODUS HOTEL" anzeigen
 
 ---------------------------------------------------------
-## ALARMMODUS AKTIVIEREN
+## ÜBERWACHUNG AKTIVIEREN
+// Aktivieren über Drucktaster oder Web-App möglich
 
-Wenn Überwachung aktiv == 1             // in Web-App schalten
-   dann in Web-App "STARTE ÜBERWACHUNG" anzeigen
-   und warte 5 Sekunden
-      wenn Modus "GEPÄCKCHECK" == 1
+Wenn Drucktaster 1x lang betätigt         // mind. 3 Sekunden
+oder 
+Wenn "Starte Überwachung" in Web-App gewählt
+   dann am Display "Starte Überwachung" anzeigen
+   und in Web-App "Starte Überwachung" anzeigen
+
+   warte 10 Sekunden
+   
+      wenn Modus "Hotel" == 1
+          dann aktiviere Ultraschall
+          und am Display "Hotel AKTIV" anzeigen
+          und in Web-App "Hotel AKTIV" anzeigen
+      wenn Modus "Gepäck" == 1
           dann aktiviere Beschleunigungssensor
-          und in Web-App "GEPÄCKCHECK AKTIV" anzeigen
-      wenn Modus "RAUMCHECK" == 1
-          dann aktiviere Bewegungssensor
-          und in Web-App "RAUMCHECK AKTIV" anzeigen
+          und am Display "Gepäck AKTIV" anzeigen
+          und in Web-App "Gepäck AKTIV" anzeigen
+      wenn Modus "Zelt" == 1
+          dann aktiviere IR-Sensor
+          und am Display "Zelt AKTIV" anzeigen
+          und in Web-App "Zelt AKTIV" anzeigen
 
 ---------------------------------------------------------
-## ALARMMODUS DEAKTIVIEREN
+## ÜBERWACHUNG DEAKTIVIEREN
+// Deaktivieren über Web-App oder Strom kappen am Hauptschalter 
 
-Wenn Überwachung aktiv == 0           // in Web-App schalten
-    dann in Web-App "BEENDE ÜBERWACHUNG" anzeigen
-    und warte 5 Sekunden
-       wenn Überwachung aktiv == 1
-          break;
-       wenn Überwachug aktiv == 0
-          dann deaktiviere alle Sensoren
-          und in Web-App "MODUS WÄHLEN" anzeigen
+Wenn "Beende Überwachung" in Web-App gewählt
+   dann am Display "BEENDE ÜBERWACHUNG" anzeigen
+   und in Web-App "BEENDE ÜBERWACHUNG" anzeigen 
+
+   warte 5 Sekunden
+
+   Wenn vorher "Starte Überwachung" gewählt
+   break;
+
+   Sonst deaktiviere alle Sensoren
+   und am Display "MODUS HOTEL" anzeigen        
+   und in Web-App "MODUS HOTEL" anzeigen
        
 ---------------------------------------------------------
 ## ALARMZUSTAND
 
-Wenn Sensor ausgelöst        
+Wenn einer der Sensor auslöst        
    dann LED an
    und Lautsprecher an
    und Buzzer an
+   und am Display "ALARM!!!" anzeigen
    und in Web-App "ALARM!!!" anzeigen
 
 ---------------------------------------------------------
