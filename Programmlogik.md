@@ -12,7 +12,7 @@ Wenn Wippschalter == 1
 ## MODUSWECHSELN
 // Moduswechsel über Drucktaster oder Web-App möglich
 
-Wenn Drucktaster 1x kurz betätigt         // max. 1 Sekunde
+Wenn Drucktaster 1x kurz betätigt         // < 3 Sekunden
    dann Wechsel zwischen Modi:
       Modus "Gepäck"             // scannt Bewegungen über Beschleunigungssensor auf dem Arduino
          am Display "MODUS GEPÄCK" anzeigen        
@@ -40,7 +40,7 @@ Wenn Auswahl in Web-App == Modus "Hotel"
 ## ÜBERWACHUNG AKTIVIEREN
 // Aktivieren über Drucktaster oder Web-App möglich
 
-Wenn Drucktaster 1x lang betätigt         // mind. 3 Sekunden
+Wenn Drucktaster 1x lang betätigt         // > 3 Sekunden
 oder 
 Wenn "Starte Überwachung" in Web-App gewählt
    dann am Display "Starte Überwachung" anzeigen
@@ -48,40 +48,37 @@ Wenn "Starte Überwachung" in Web-App gewählt
 
    warte 10 Sekunden
    
-      wenn Modus "Hotel" == 1
+      wenn Modus == "Hotel"
           dann aktiviere Ultraschall
           und am Display "Hotel AKTIV" anzeigen
           und in Web-App "Hotel AKTIV" anzeigen
-      wenn Modus "Gepäck" == 1
+      wenn Modus == "Gepäck"
           dann aktiviere Beschleunigungssensor
           und am Display "Gepäck AKTIV" anzeigen
           und in Web-App "Gepäck AKTIV" anzeigen
-      wenn Modus "Zelt" == 1
+      wenn Modus == "Zelt"
           dann aktiviere IR-Sensor
           und am Display "Zelt AKTIV" anzeigen
           und in Web-App "Zelt AKTIV" anzeigen
 
 ---------------------------------------------------------
 ## ÜBERWACHUNG DEAKTIVIEREN
-// Deaktivieren über Web-App oder Strom kappen am Hauptschalter 
+// Deaktivieren über Web-App
 
 Wenn "Beende Überwachung" in Web-App gewählt
    dann am Display "BEENDE ÜBERWACHUNG" anzeigen
    und in Web-App "BEENDE ÜBERWACHUNG" anzeigen 
 
-   warte 5 Sekunden
+   nach 5 Sekunden
 
-   Wenn vorher "Starte Überwachung" gewählt
-   break;
-
-   Sonst deaktiviere alle Sensoren
+   Sensoren deaktivieren
    und am Display "MODUS HOTEL" anzeigen        
    und in Web-App "MODUS HOTEL" anzeigen
        
 ---------------------------------------------------------
 ## ALARMZUSTAND
 
-Wenn einer der Sensor auslöst        
+Wenn einer der Sensoren auslöst        
    dann LED an
    und Lautsprecher an
    und Buzzer an
@@ -92,5 +89,5 @@ Wenn einer der Sensor auslöst
 ## GERÄT ÜBER HAUPTSCHALTER AUSSCHALTEN
 
 Wenn Wippschalter == 0                // wichtig: hardwareseitig Schalter "verstecken", um Manipulation zu erschweren
-   dann Powerbank auf low schalten
+   Physikalische unterbrechung des Stromkreises
    und in Web-App "AUS" anzeigen
