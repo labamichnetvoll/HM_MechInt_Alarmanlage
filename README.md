@@ -35,8 +35,13 @@ Alles wichtige ist hier zu beziehen:
 
 > [!IMPORTANT]
 > Mit dependency installieren!
-- AdafruitGFX Library &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Für O-LED*
 - Adafruit SSD1306    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Für O-LED*
+- (AdafruitGFX Library) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Für O-LED*
+- (Adafruit BusIO)
 - Grove Ultrasonic Ranger by Seeed Studio    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Für Ultraschallsensor*
 - *evtl noch etwas für Lautsprecher*
 
+## Board Bibliothek
+- Arduino SAMD Boards (32-bits ARM Cortex-M0+)
+> [!TIP]
+> Bei Auswahl des Arduino Nano 33 IoT in der Board-Auswahl wird diese Board-Bibliothek automatisch zur Installation vorgeschlagen  
