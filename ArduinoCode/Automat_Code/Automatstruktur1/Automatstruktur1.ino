@@ -1,7 +1,17 @@
 #define PERIOD_UPDATE 100   // Zeit in ms
 
 long lastupdate = millis();
-
+enum Zustand {
+  Start,
+  Initialisierung,
+  Auswahl_Hotel,
+  Auswahl_Zeit,
+  Auswahl_Gepaeck,
+  Scharf_Hotel,
+  Scharf_Gepaeck,
+  Scharf_Zelt,
+  Alarm
+}
 
 
 
@@ -24,5 +34,5 @@ void loop() {
 
 }
 
-// Automaten Schritte hier
+// Funktionen hier
 
