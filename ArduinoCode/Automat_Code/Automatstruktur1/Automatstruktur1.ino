@@ -1,3 +1,12 @@
+/** Nützliche Links:
+ * https://docs.arduino.cc/language-reference/en/functions/external-interrupts/attachInterrupt/
+ * https://docs.arduino.cc/tutorials/nano-33-iot/imu-accelerometer/
+ *
+ *
+*/
+
+
+
 /* Bibliotheken Einbinden */
 #include <Arduino.h>
 #include "Ultrasonic.h"            //fertige Bibliothek für Ultraschall Sensor
@@ -6,6 +15,7 @@
 /* PIN Nummer - Defintionen*/
 #define ULTRASONIC_PIN_NR 7     // evtl. anpassen! TODO   
 #define INFRAROT_PIN_NR 6       // evtl. anpassen! TODO
+#define BUTTON_PIN 2            // evtl. anpassen! TODO     Auswahl Pins: 2, 3, 9, 10, 11, 13, A1, A5, A7
 
 /* Konstanten */
 #define PERIOD_UPDATE 100   // Taktlänge in ms
@@ -38,6 +48,8 @@ void setup() {
   Serial.println("Started.");
   /* IO-Init*/
   pinMode(INFRAROT_PIN_NR, INPUT);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  //attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), ISR_NAME??, CHANGE);   //ISR Funktion hinzufügen
 
   /* IMU Init*/
   if (!IMU.begin()){
