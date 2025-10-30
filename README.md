@@ -39,6 +39,7 @@ Alles wichtige ist hier zu beziehen:
 - (AdafruitGFX Library) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Für O-LED*
 - (Adafruit BusIO)
 - Grove Ultrasonic Ranger by Seeed Studio    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Für Ultraschallsensor*
+- LSM6DS3 by Arduino    [Doku/](https://docs.arduino.cc/tutorials/nano-33-iot/imu-accelerometer/)
 - *evtl noch etwas für Lautsprecher*
 
 ## Board Bibliothek
