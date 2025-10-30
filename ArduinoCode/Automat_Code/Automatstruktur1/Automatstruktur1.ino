@@ -1,6 +1,6 @@
-#define PERIOD_UPDATE 100   // Zeit in ms
+#define PERIOD_UPDATE 100   // Taktlänge in ms
 
-long lastupdate = millis();
+long lastupdate = 0;
 enum Zustand {
   Start,
   Initialisierung,
@@ -14,16 +14,20 @@ enum Zustand {
 }
 
 
-
 void setup() {
-  Zustand = Start;
+
+  Zustand = Start;        //Zustand auf Start
+  lastupdate = millis();  //Taktzähler zurücksetzen
 
 }
 
+
 void loop() {
-  // put your main code here, to run repeatedly:
 
   if (millis() - lastupdate > PERIOD_UPDATE)  {
+
+    lastupdate = millis();  //Taktzähler zurücksetzen
+
     //Zustandswechsel hier
     switch(Zustand){
     case Start:
@@ -38,13 +42,13 @@ void loop() {
     case Auswahl_Zelt:
       break;
 
-    case Auswahl_Gepaek:
+    case Auswahl_Gepaeck:
       break;
 
     case Scharf_Hotel:
       break;
 
-    case Scharf_Gepaek:
+    case Scharf_Gepaeck:
       break;
 
     case Scharf_Zelt:
@@ -52,11 +56,12 @@ void loop() {
     
     case Alarm:
       break;
-      
-    }
-    lastupdate = millis();
-  }
 
+    default Default:
+      Zustand = Start;
+      break;
+    }
+  }
 }
 
 // Funktionen hier
