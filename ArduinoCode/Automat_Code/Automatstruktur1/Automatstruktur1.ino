@@ -1,3 +1,5 @@
+#include "Sensorik.h"
+
 #define PERIOD_UPDATE 100   // Taktlänge in ms
 
 long lastupdate = 0;
