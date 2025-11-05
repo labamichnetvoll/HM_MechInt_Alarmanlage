@@ -39,10 +39,14 @@ Alles wichtige ist hier zu beziehen:
 - (AdafruitGFX Library) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Für O-LED*
 - (Adafruit BusIO)
 - Grove Ultrasonic Ranger by Seeed Studio    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Für Ultraschallsensor*
-- LSM6DS3 by Arduino    [Doku/](https://docs.arduino.cc/tutorials/nano-33-iot/imu-accelerometer/)
+- LSM6DS3 by Arduino    [Doku](https://docs.arduino.cc/tutorials/nano-33-iot/imu-accelerometer/)
 - *evtl noch etwas für Lautsprecher*
 
 ## Board Bibliothek
 - Arduino SAMD Boards (32-bits ARM Cortex-M0+)
 > [!TIP]
 > Bei Auswahl des Arduino Nano 33 IoT in der Board-Auswahl wird diese Board-Bibliothek automatisch zur Installation vorgeschlagen  
+
+## nützliche Links für die Programmierung
+- [erweiterter Zustandsautomat](https://forum.arduino.cc/t/zustandsautomaten-fur-fortgeschrittene/320984/2)
+- [switch case Bsp Zustandsautomat](https://spacehal.github.io/docs/arduino/stateMachine)
