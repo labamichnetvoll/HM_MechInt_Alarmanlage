@@ -75,6 +75,8 @@ void loop() {
 
     lastupdate = millis();  //Taktzähler zurücksetzen
 
+    RawIMU();
+
     //Zustandswechsel hier
     switch(Zustand){
 

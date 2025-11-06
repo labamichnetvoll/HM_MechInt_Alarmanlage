@@ -7,6 +7,7 @@
 
 
 float acc_x, acc_y, acc_z;    //Speicher für Beschleunigungswerte
+float acc_x_old, acc_y_old, acc_z_old;  
 int degreesX = 0;
 int degreesY = 0;
 int degreesZ = 0;      
@@ -46,42 +47,42 @@ int ReadIMUAcc() {
   }
 
 /* Test Code --> IMU Verifizieren*/
-  if (acc_x > 0.1) {
+  if (acc_x > 0.2) {
     acc_x = 100 * acc_x;
     degreesX = map(acc_x, 0, 97, 0, 90);
     Serial.print("Tilting up ");
     Serial.print(degreesX);
     Serial.println("  degrees");
   }
-  if (acc_x < -0.1) {
+  if (acc_x < -0.2) {
     acc_x = 100 * acc_x;
     degreesX = map(acc_x, 0, -100, 0, 90);
     Serial.print("Tilting down ");
     Serial.print(degreesX);
     Serial.println("  degrees");
   }
-  if (acc_y > 0.1) {
+  if (acc_y > 0.2) {
     acc_y = 100 * acc_y;
     degreesY = map(acc_y, 0, 97, 0, 90);
     Serial.print("Tilting left ");
     Serial.print(degreesY);
     Serial.println("  degrees");
   }
-  if (acc_y < -0.1) {
+  if (acc_y < -0.2) {
     acc_y = 100 * acc_y;
     degreesY = map(acc_y, 0, -100, 0, 90);
     Serial.print("Tilting right ");
     Serial.print(degreesY);
     Serial.println("  degrees");
   }
-  if (acc_z > 0.1) {
+  if (acc_z > 0.2) {
     acc_z = 100 * acc_z;
     degreesZ = map(acc_z, 0, 97, 0, 90);
     Serial.print("Tilting front? ");
     Serial.print(degreesZ);
     Serial.println("  degrees");
   }
-  if (acc_z < -0.1) {
+  if (acc_z < -0.2) {
     acc_z = 100 * acc_z;
     degreesZ = map(acc_z, 0, -100, 0, 90);
     Serial.print("Tilting back? ");
@@ -90,6 +91,31 @@ int ReadIMUAcc() {
   }
 
   return dataread;
+}
+
+// Test Funktion
+void RawIMU() {
+  if (IMU.accelerationAvailable()) {
+    IMU.readAcceleration(acc_x, acc_y, acc_z);
+  }
+
+  if (acc_x - acc_x_old > 0.01) {
+    Serial.print("X:");
+    Serial.println(acc_x);
+    acc_x_old = acc_x;
+  }
+   if (acc_y - acc_y_old > 0.01) {
+    Serial.print("Y:");
+    Serial.println(acc_y);
+    acc_y_old = acc_y;
+  }
+   if (acc_z - acc_z_old > 0.01) {
+    Serial.print("Z:");
+    Serial.println(acc_z);
+    acc_z_old = acc_z;
+  }
+
+
 }
 
 
