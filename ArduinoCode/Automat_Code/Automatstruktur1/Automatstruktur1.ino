@@ -1,9 +1,7 @@
-/** Nützliche Links:
+/* Nützliche Links:
  * https://docs.arduino.cc/language-reference/en/functions/external-interrupts/attachInterrupt/
  * https://docs.arduino.cc/tutorials/nano-33-iot/imu-accelerometer/
- *
- *
-*/
+ */
 
 
 
@@ -23,20 +21,20 @@
 
 
 /* Variablen für Automaten */
-long lastupdate = 0;
-enum Zustaende {
+unsigned long ulLastupdate = 0;
+enum enZustaende {
   Start,
-  Initialisierung,
-  Auswahl_Hotel,
-  Auswahl_Gepaeck,
-  Auswahl_Zelt,
-  Scharf_Hotel,
-  Scharf_Gepaeck,
-  Scharf_Zelt,
+  Sensorauswahl,
+  Aktiv,
   Alarm
 };
+enum enZustaende Zustand;
 
-enum Zustaende Zustand;
+/* Sensorvariablen */
+bool bIR_Sensor_an = 0;
+bool bUS_Sensor_an = 0;
+bool bA-Sensor_an = 0;
+bool bSensor_ausgeloest = 0;
 
 /* Konstruktor CPP Klassen*/
 Ultrasonic ultrasonic(ULTRASONIC_PIN_NR);
@@ -65,16 +63,16 @@ void setup() {
 
   /* Automat-Init*/
   Zustand = Start;        //Zustand auf Start
-  lastupdate = millis();  //Taktzähler zurücksetzen
+  ulLastupdate = millis();  //Taktzähler zurücksetzen
 
 }
 
 
 void loop() {
 
-  if (millis() - lastupdate > PERIOD_UPDATE)  {
+  if (millis() - ulLastupdate > PERIOD_UPDATE)  {   //if-Abfrage funktioniert für mindestens 7 Wochen, dann Overflow möglich
 
-    lastupdate = millis();  //Taktzähler zurücksetzen
+    ulLastupdate = millis();  //Taktzähler zurücksetzen
 
     RawIMU();
 
@@ -82,61 +80,41 @@ void loop() {
     switch(Zustand){
 
     case Start:
-      Zustand = Initialisierung;
-      break;
-
-    case Initialisierung:
-      //IR-Sensor initialisieren
-      //a-Sensor initialisieren
-      //Schallsensor initialisieren
-      //Display initialisieren
-      //ISR initialisieren
-      Zustand = Auswahl_Hotel;  //Nach Abschluss: zu Auswahl_Hotel wechseln
-      break;
-
-    case Auswahl_Hotel:
-      //Anzeige: Hotelmodus
-      //Falls kurzer Knopfdruck: zu Auswahl_Gepaeck wechseln
-      //Falls langer Knopfdruck: Countdown, dann zu Scharf_Hotel wechseln
-      break;
-
-    case Auswahl_Gepaeck:
-      //Anzeige: Gepäckmodus
-      //Falls kurzer Knopfdruck: zu Auswahl_Zelt wechseln
-      //Falls langer Knopfdruck: Countdowhn, dann zu Scharf_Gepaeck wechseln
-      break;
-
-    case Auswahl_Zelt:
-      //Anzeige: Zeltmodus
-      //Falls kurzer Knopfdruck: zu Auswahl_Hotel wechseln
-      //Falls langer Knopfdruck: Countdown, dann zu Scharf_Zelt wechseln
-      break;
-
-    case Scharf_Hotel:
-      //Entschärfung prüfen
-      //Falls entschärft: zu Initialisierung wechseln
-      //Schallsensor abfragen
-      //Falls Abstand stark verändert: zu Alarm wechseln
-      break;
-
-    case Scharf_Gepaeck:
-     //Entschärfung prüfen
-      //Falls entschärft: zu Initialisierung wechseln
-      //a-Sensor abfragen
-      //Falls starke Beschleunigung: zu Alarm wechseln
-      break;
-
-    case Scharf_Zelt:
-      //Entschärfung prüfen
-      //Falls entschärft: zu Initialisierung wechseln
-      //IR-Sensor abfragen
-      //Falls Bewegung erkannt: zu Alarm wechseln
+      //Sensoren und Aktoren Initialisieren
+      IR_Sensor_an = 0;
+      US_Sensor_an = 0;
+      a-Sensor_an = 0;
+      Zustand = Sensorauswahl;
       break;
     
+    case Sensorauswahl:
+      //Diplay zeigt "Bereit"
+      //Nach Eingabe durch Web UI: weiter zu Aktiv
+      break;
+
+    case Aktiv:
+      if(bIR_Sensor_an){
+        //Sensor abfragen
+      }
+      if(bUS_Sensor_an){
+        //Sensor abfragen
+      }
+      if(bA-Sensor_an){
+        //Sensor abfragen
+      }
+
+      if(bSensor_ausgeloest){
+        Zustand = Alarm;
+      }
+      break;
+
     case Alarm:
-      //Entschärfung prüfen
-      //Falls entschärft: zu Initialisierung wechseln
-      //Sonst: LED blinken, Lautsprecher aktivieren, Piezo aktivieren
+      //LED blinken, Lautsprecher aktivieren, Piezo aktivieren
+      //Web UI kann bSensor_ausgeloest auf 0 setzen
+
+      if(!bSensor_ausgeloest){
+        Zustand = Start;
+      }
       break;
 
     default:
@@ -144,6 +122,9 @@ void loop() {
       Zustand = Start;
       break;
     }
+  }
+  if (ulLastupdate - millis() > 0) {    //Bei Overflow: ulLastupdate neu setzen, um Takt wiederherzustellen
+    ulLastupdate = millis();
   }
 }
 
