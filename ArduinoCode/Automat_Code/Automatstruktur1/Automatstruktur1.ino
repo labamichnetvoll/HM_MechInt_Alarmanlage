@@ -11,6 +11,7 @@
 #include <Arduino.h>
 #include "Ultrasonic.h"            //fertige Bibliothek für Ultraschall Sensor
 #include <Arduino_LSM6DS3.h>       // IMU
+#include "WebServer.h"             // Web Anteil
 
 /* PIN Nummer - Defintionen*/
 #define ULTRASONIC_PIN_NR 7     // evtl. anpassen! TODO   
