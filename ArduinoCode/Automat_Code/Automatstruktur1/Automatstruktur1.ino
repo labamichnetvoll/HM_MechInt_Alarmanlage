@@ -33,7 +33,7 @@ enum enZustaende Zustand;
 /* Sensorvariablen */
 bool bIR_Sensor_an = 0;
 bool bUS_Sensor_an = 0;
-bool bA-Sensor_an = 0;
+bool bA_Sensor_an = 0;
 bool bSensor_ausgeloest = 0;
 
 /* Konstruktor CPP Klassen*/
@@ -81,15 +81,18 @@ void loop() {
 
     case Start:
       //Sensoren und Aktoren Initialisieren
-      IR_Sensor_an = 0;
-      US_Sensor_an = 0;
-      a-Sensor_an = 0;
+      bIR_Sensor_an = 0;
+      bUS_Sensor_an = 0;
+      bA_Sensor_an = 0;
       Zustand = Sensorauswahl;
       break;
     
     case Sensorauswahl:
       //Diplay zeigt "Bereit"
-      //Nach Eingabe durch Web UI: weiter zu Aktiv
+      //Web UI kann Sensorvariablen ändern:
+      if(bIR_Sensor_an || bUS_Sensor_an || bA_Sensor_an){
+        Zustand = Aktiv;
+      }
       break;
 
     case Aktiv:
@@ -99,7 +102,7 @@ void loop() {
       if(bUS_Sensor_an){
         //Sensor abfragen
       }
-      if(bA-Sensor_an){
+      if(bA_Sensor_an){
         //Sensor abfragen
       }
 
