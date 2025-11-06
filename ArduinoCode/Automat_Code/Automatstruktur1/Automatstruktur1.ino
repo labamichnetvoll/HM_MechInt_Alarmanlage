@@ -1,9 +1,29 @@
-#include "Sensorik.h"
+/** Nützliche Links:
+ * https://docs.arduino.cc/language-reference/en/functions/external-interrupts/attachInterrupt/
+ * https://docs.arduino.cc/tutorials/nano-33-iot/imu-accelerometer/
+ *
+ *
+*/
 
+
+
+/* Bibliotheken Einbinden */
+#include <Arduino.h>
+#include "Ultrasonic.h"            //fertige Bibliothek für Ultraschall Sensor
+#include <Arduino_LSM6DS3.h>       // IMU
+
+/* PIN Nummer - Defintionen*/
+#define ULTRASONIC_PIN_NR 7     // evtl. anpassen! TODO   
+#define INFRAROT_PIN_NR 6       // evtl. anpassen! TODO
+#define BUTTON_PIN 2            // evtl. anpassen! TODO     Auswahl Pins: 2, 3, 9, 10, 11, 13, A1, A5, A7
+
+/* Konstanten */
 #define PERIOD_UPDATE 100   // Taktlänge in ms
 
+
+/* Variablen für Automaten */
 long lastupdate = 0;
-enum Zustand {
+enum Zustaende {
   Start,
   Initialisierung,
   Auswahl_Hotel,
@@ -13,11 +33,36 @@ enum Zustand {
   Scharf_Gepaeck,
   Scharf_Zelt,
   Alarm
-}
+};
+
+enum Zustaende Zustand;
+
+/* Konstruktor CPP Klassen*/
+Ultrasonic ultrasonic(ULTRASONIC_PIN_NR);
 
 
 void setup() {
 
+  Serial.begin(115200);
+  while (!Serial);          //TODO Später auskommentieren!
+  Serial.println("Started.");
+  /* IO-Init*/
+  pinMode(INFRAROT_PIN_NR, INPUT);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  //attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), ISR_NAME??, CHANGE);   //ISR Funktion hinzufügen
+
+  /* IMU Init*/
+  if (!IMU.begin()){
+    Serial.println("Failed to initialize IMU!");
+    while (1);    // aus ExampleCode - Simple Accelerometer
+  }
+  Serial.print("Accelerometer sample rate = ");
+  Serial.print(IMU.accelerationSampleRate());
+  Serial.println(" Hz");
+
+
+
+  /* Automat-Init*/
   Zustand = Start;        //Zustand auf Start
   lastupdate = millis();  //Taktzähler zurücksetzen
 
@@ -91,7 +136,7 @@ void loop() {
       //Sonst: LED blinken, Lautsprecher aktivieren, Piezo aktivieren
       break;
 
-    default Default:
+    default:
       //Nur zur Fehlerbehebung, immer zu Start wechseln
       Zustand = Start;
       break;
