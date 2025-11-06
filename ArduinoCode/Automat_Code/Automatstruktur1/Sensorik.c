@@ -15,7 +15,7 @@ long ReturnUltraschall(){
 }
 
 
-
+//WIchtigen Kommentar
 boolean ReturnInfrarot(){
 
   return digitalRead(INFRAROT_PIN_NR);
