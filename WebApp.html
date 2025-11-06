@@ -10,9 +10,7 @@
       padding: 20px;
       text-align: center;
     }
-    h1 {
-      color: #2c3e50;
-    }
+    h1 { color: #2c3e50; }
     .status {
       margin: 20px 0;
       font-size: 18px;
@@ -30,6 +28,7 @@
       font-weight: bold;
       display: none;
       border-radius: 8px;
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -39,17 +38,17 @@
 
   <!-- Statusanzeigen -->
   <div class="status">
-    <div><strong>Gerätestatus:</strong> <span id="geraetStatus">MODUS WÄHLEN</span></div>
-    <div><strong>Aktueller Modus:</strong> <span id="modusStatus">-</span></div>
+    <div><strong>Gerätestatus:</strong> <span id="geraetStatus">MODUS HOTEL</span></div>
+    <div><strong>Aktueller Modus:</strong> <span id="modusStatus">HOTEL</span></div>
     <div><strong>Überwachung:</strong> <span id="ueberwachungStatus">INAKTIV</span></div>
   </div>
 
   <!-- Modusauswahl -->
   <label for="modus">Modus wählen:</label>
   <select id="modus" onchange="modusWechseln()">
-    <option value="waehlen">MODUS WÄHLEN</option>
-    <option value="raum">RAUMCHECK</option>
-    <option value="gepaeck">GEPÄCKCHECK</option>
+    <option value="hotel">HOTEL</option>
+    <option value="gepaeck">GEPÄCK</option>
+    <option value="zelt">ZELT</option>
   </select>
 
   <!-- Überwachungssteuerung -->
@@ -62,53 +61,67 @@
   <div id="alarmBox" class="alarm">🚨 ALARM!!!</div>
 
   <script>
-    // Zustände speichern
-    let modus = "waehlen";
-    let ueberwachungAktiv = false;
-
-    function modusWechseln() {
-      modus = document.getElementById("modus").value;
-
-      // Anzeige aktualisieren
-      document.getElementById("modusStatus").innerText = modus.toUpperCase();
-
-      // Optional: an Arduino senden
-      fetch("/modus?typ=" + modus);
-
-      // Gerätestatus ändern
-      document.getElementById("geraetStatus").innerText =
-        modus === "waehlen" ? "MODUS WÄHLEN" : modus.toUpperCase() + " AKTIV";
+    async function modusWechseln() {
+      const modus = document.getElementById("modus").value;
+      try {
+        await fetch("/modus?typ=" + modus);
+        // danach Status neu laden
+        ladeStatus();
+      } catch (e) {
+        console.error(e);
+      }
     }
 
-    function starteUeberwachung() {
-      ueberwachungAktiv = true;
-      document.getElementById("ueberwachungStatus").innerText = "AKTIV";
-      fetch("/start");
-
-      // Optional: 5 Sekunden warten oder Animation anzeigen
-      alert("Überwachung gestartet für " + modus.toUpperCase());
+    async function starteUeberwachung() {
+      try {
+        await fetch("/start");
+        ladeStatus();
+      } catch (e) {
+        console.error(e);
+      }
     }
 
-    function stoppeUeberwachung() {
-      ueberwachungAktiv = false;
-      document.getElementById("ueberwachungStatus").innerText = "INAKTIV";
-      fetch("/stop");
-
-      // Gerätestatus zurücksetzen
-      document.getElementById("geraetStatus").innerText = "MODUS WÄHLEN";
+    async function stoppeUeberwachung() {
+      try {
+        await fetch("/stop");
+        ladeStatus();
+      } catch (e) {
+        console.error(e);
+      }
     }
 
-    // Beispiel: Alarm auslösen (dieser Teil wird normalerweise vom Gerät getriggert)
-    function alarmAusloesen() {
-      document.getElementById("alarmBox").style.display = "block";
+    async function ladeStatus() {
+      try {
+        const res = await fetch("/status");
+        if (!res.ok) return;
+        const data = await res.json();
+
+        document.getElementById("geraetStatus").innerText       = data.geraet;
+        document.getElementById("modusStatus").innerText        = data.modus;
+        document.getElementById("ueberwachungStatus").innerText = data.ueberwachung;
+
+        // Dropdown passend zum Modus setzen
+        const select = document.getElementById("modus");
+        const m = data.modus.toLowerCase();
+        if (m === "hotel" || m === "gepäck" || m === "zelt") {
+          // ä -> ae für Value
+          let value = m.replace("ä", "ae");
+          select.value = value;
+        }
+
+        // Alarmanzeige
+        document.getElementById("alarmBox").style.display =
+          data.alarm ? "block" : "none";
+
+      } catch (e) {
+        console.error("Status konnte nicht geladen werden:", e);
+      }
     }
 
-    // Beispiel: Alarm beenden
-    function alarmZuruecksetzen() {
-      document.getElementById("alarmBox").style.display = "none";
-    }
-
-    // Du kannst später auch über fetch('/alarm') oder WebSocket Alarmzustand anzeigen lassen
+    // Alle 1 s Status vom Arduino holen
+    setInterval(ladeStatus, 1000);
+    // Beim Laden der Seite einmalig Status holen
+    ladeStatus();
   </script>
 </body>
 </html>
