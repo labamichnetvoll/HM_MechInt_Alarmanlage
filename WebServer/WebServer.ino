@@ -82,6 +82,12 @@ static void updateWebStatusFromZustand() {
   }
 }
 
+void setup(){
+  WebServer_begin();
+
+}
+int main(){}
+
 // ------------------------------------------------------------------
 // HTML-Seite senden (hier stark gekürzt – du kannst deine gesamte
 // HTML-Seite einfügen)
