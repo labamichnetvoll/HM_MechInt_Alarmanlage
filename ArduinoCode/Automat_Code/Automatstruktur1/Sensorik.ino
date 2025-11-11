@@ -24,8 +24,8 @@ long ReturnUltraschall()  {
 /**
  * @brief Gibt Status von IR_Sensor zurück
 */
-int ReturnInfrarot(int pin_nr) {
-  return digitalRead(pin_nr);
+bool ReturnInfrarot() {
+  return digitalRead(INFRAROT_PIN_NR);
 }
 
 

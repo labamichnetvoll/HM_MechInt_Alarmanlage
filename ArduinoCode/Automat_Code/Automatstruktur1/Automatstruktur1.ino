@@ -49,7 +49,7 @@ long ldistultraschallvgl = 0;
 Ultrasonic ultrasonic(ULTRASONIC_PIN_NR);
 
 /* Funktionsprototypen*/
-void Alarm();
+void AlarmOutput();
 
 void setup() {
 
@@ -132,7 +132,7 @@ void loop() {
       case Aktiv:
         if(bIR_Sensor_an){
           //Sensor abfragen
-          bSensorAusgeloest = ReturnInfrarot();
+          bSensor_ausgeloest = ReturnInfrarot();
 
         }
         if(bUS_Sensor_an){
@@ -156,7 +156,7 @@ void loop() {
         //LED blinken, Lautsprecher aktivieren, Piezo aktivieren
         //Web UI kann bSensor_ausgeloest auf 0 setzen
 
-        Alarm();
+        AlarmOutput();
 
 
         if(!bSensor_ausgeloest){
@@ -182,7 +182,7 @@ void loop() {
 // Funktionen hier
 
 //LED blinken, Lautsprecher aktivieren, Piezo aktivieren
-void Alarm(){
+void AlarmOutput(){
 
   volatile unsigned long takt = 0;
   digitalWrite(SHDN_PIN, 1);      // Verstärker AN
