@@ -1,10 +1,13 @@
-# Projekt Alarmanlage
+# Projekt Alarmanlage 
+> [!NOTE]
+> [Aktuelle Doku HIER!](https://github.com/labamichnetvoll/HM_MechInt_Alarmanlage/tree/doku_github)
+
 
 Dieses GitHub Repository dient als Code Austausch Plattform
 
 Folgende Unterordner sind geplant:
 1. ArduinoCode
-2. Web-App (html - css)
+2. Web-App (html - css) & Backend WebServer
 3. Schaltplan (KiCAD 9.x)
 
 
@@ -28,21 +31,22 @@ Folgende Unterordner sind geplant:
 
 ## FAQ
 1. Bei Fragen, Anmerkungen oder Verbesserungsvorschlägen an @labamichnetvoll (Florian) wenden
-2. **[Markdown Syntax](https://docs.github.com/de/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)**
+2. **[Markdown Syntax](https://docs.github.com/de/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)** für Doku auf GitHub
 
-## Biblotheken Arduino IDE
-Alles wichtige ist hier zu beziehen:
-
+## Arduino IDE Biblotheken 
+Alle relevanten Bibliotheken sind hier aufgeführt.  
 > [!IMPORTANT]
-> Mit dependency installieren!
+> Alle Bibliotheken **mit** dependencys (Abhängigkeiten) installieren!
+> Bitte haltet diese Liste aktuell, sonst kann der Code evtl. nicht von jedem kompiliert werden!
 - Adafruit SSD1306    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Für O-LED*
 - (AdafruitGFX Library) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Für O-LED*
 - (Adafruit BusIO)
 - Grove Ultrasonic Ranger by Seeed Studio    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Für Ultraschallsensor*
-- LSM6DS3 by Arduino    [Doku](https://docs.arduino.cc/tutorials/nano-33-iot/imu-accelerometer/)
-- *evtl noch etwas für Lautsprecher*
+- LSM6DS3 by Arduino    [Doku](https://docs.arduino.cc/tutorials/nano-33-iot/imu-accelerometer/)&nbsp;&nbsp;&nbsp;&nbsp; *Für IMU*
+- WiFiNINA by Arduino   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Für das Wlan-Modul des Nano 33 IoT*
+- 
 
-## Board Bibliothek
+## Arduino IDE Board Bibliothek
 - Arduino SAMD Boards (32-bits ARM Cortex-M0+)
 > [!TIP]
 > Bei Auswahl des Arduino Nano 33 IoT in der Board-Auswahl wird diese Board-Bibliothek automatisch zur Installation vorgeschlagen  
@@ -50,3 +54,7 @@ Alles wichtige ist hier zu beziehen:
 ## nützliche Links für die Programmierung
 - [erweiterter Zustandsautomat](https://forum.arduino.cc/t/zustandsautomaten-fur-fortgeschrittene/320984/2)
 - [switch case Bsp Zustandsautomat](https://spacehal.github.io/docs/arduino/stateMachine)
+- [Interessante WebServer Libary](https://github.com/khoih-prog/WiFiWebServer?tab=readme-ov-file#features)
+- [Gute Erklärung Arduino WebServer](https://werner.rothschopf.net/202001_arduino_webserver_post.htm)
+- [Optimierung Arduino WebServer](https://werner.rothschopf.net/microcontroller/202011_arduino_webserver_optimieren.htm)
+- [Erklärung Arduino Speicher](https://docs.arduino.cc/learn/programming/memory-guide/)
