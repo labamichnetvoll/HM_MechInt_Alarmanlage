@@ -102,9 +102,12 @@ void loop() {
 
     ReturnAcceleration();   //TEST
 
+    //Serial.print("Aktueller Zustand: ");
+    //Serial.println(Zustand);
 
     //Zustandswechsel hier
     switch(Zustand){
+      
 
       case Start:
         // Alarm ausschalten
