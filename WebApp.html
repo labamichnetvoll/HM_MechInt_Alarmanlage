@@ -1,3 +1,5 @@
+<!Erklärung zu den GET-Requests ist unter dem Code>
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -15,11 +17,21 @@
       margin: 20px 0;
       font-size: 18px;
     }
-    select, button {
-      padding: 10px 20px;
+    button, label {
       font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
       margin: 10px;
       border-radius: 6px;
+    }
+    .sensor-group {
+      margin: 20px 0;
+      font-size: 16px;
+    }
+    .sensor-group label {
+      display: block;
+      margin: 5px 0;
     }
     .alarm {
       background-color: red;
@@ -38,18 +50,27 @@
 
   <!-- Statusanzeigen -->
   <div class="status">
-    <div><strong>Gerätestatus:</strong> <span id="geraetStatus">MODUS HOTEL</span></div>
-    <div><strong>Aktueller Modus:</strong> <span id="modusStatus">HOTEL</span></div>
+    <div><strong>Gerätestatus:</strong> <span id="geraetStatus">BEREIT</span></div>
+    <div><strong>Aktive Sensoren:</strong> <span id="sensorStatus">KEINE</span></div>
     <div><strong>Überwachung:</strong> <span id="ueberwachungStatus">INAKTIV</span></div>
   </div>
 
-  <!-- Modusauswahl -->
-  <label for="modus">Modus wählen:</label>
-  <select id="modus" onchange="modusWechseln()">
-    <option value="hotel">HOTEL</option>
-    <option value="gepaeck">GEPÄCK</option>
-    <option value="zelt">ZELT</option>
-  </select>
+  <!-- Sensorauswahl -->
+  <div class="sensor-group">
+    <strong>Sensoren auswählen:</strong>
+    <label>
+      <input type="checkbox" id="sensor_ultraschall">
+      Ultraschallsensor
+    </label>
+    <label>
+      <input type="checkbox" id="sensor_beschleunigung">
+      Beschleunigungssensor
+    </label>
+    <label>
+      <input type="checkbox" id="sensor_ir">
+      IR-Sensor
+    </label>
+  </div>
 
   <!-- Überwachungssteuerung -->
   <div>
@@ -61,20 +82,22 @@
   <div id="alarmBox" class="alarm">🚨 ALARM!!!</div>
 
   <script>
-    async function modusWechseln() {
-      const modus = document.getElementById("modus").value;
-      try {
-        await fetch("/modus?typ=" + modus);
-        // danach Status neu laden
-        ladeStatus();
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
     async function starteUeberwachung() {
+      // Ausgewählte Sensoren auslesen
+      const ultraschall    = document.getElementById("sensor_ultraschall").checked ? 1 : 0;
+      const beschleunigung = document.getElementById("sensor_beschleunigung").checked ? 1 : 0;
+      const ir             = document.getElementById("sensor_ir").checked ? 1 : 0;
+
+      // Wenn gar kein Sensor gewählt ist, abbrechen
+      if (ultraschall === 0 && beschleunigung === 0 && ir === 0) {
+        alert("Bitte mindestens einen Sensor auswählen.");
+        return;
+      }
+
+      const url = `/start?ultraschall=${ultraschall}&beschleunigung=${beschleunigung}&ir=${ir}`;
+
       try {
-        await fetch("/start");
+        await fetch(url);
         ladeStatus();
       } catch (e) {
         console.error(e);
@@ -96,18 +119,25 @@
         if (!res.ok) return;
         const data = await res.json();
 
-        document.getElementById("geraetStatus").innerText       = data.geraet;
-        document.getElementById("modusStatus").innerText        = data.modus;
-        document.getElementById("ueberwachungStatus").innerText = data.ueberwachung;
+        document.getElementById("geraetStatus").innerText       = data.geraet       || "-";
+        document.getElementById("ueberwachungStatus").innerText = data.ueberwachung || "-";
 
-        // Dropdown passend zum Modus setzen
-        const select = document.getElementById("modus");
-        const m = data.modus.toLowerCase();
-        if (m === "hotel" || m === "gepäck" || m === "zelt") {
-          // ä -> ae für Value
-          let value = m.replace("ä", "ae");
-          select.value = value;
-        }
+        // Sensor-Status aus JSON übernehmen (0/1 oder true/false)
+        const ultraschallAktiv    = !!data.ultraschall;
+        const beschleunigungAktiv = !!data.beschleunigung;
+        const irAktiv             = !!data.ir;
+
+        document.getElementById("sensor_ultraschall").checked    = ultraschallAktiv;
+        document.getElementById("sensor_beschleunigung").checked = beschleunigungAktiv;
+        document.getElementById("sensor_ir").checked             = irAktiv;
+
+        const aktive = [];
+        if (ultraschallAktiv)    aktive.push("Ultraschallsensor");
+        if (beschleunigungAktiv) aktive.push("Beschleunigungssensor");
+        if (irAktiv)             aktive.push("IR-Sensor");
+
+        document.getElementById("sensorStatus").innerText =
+          aktive.length ? aktive.join(", ") : "KEINE";
 
         // Alarmanzeige
         document.getElementById("alarmBox").style.display =
@@ -125,3 +155,25 @@
   </script>
 </body>
 </html>
+
+
+<!  Erklärung zu den GET-Requests:
+      Start Befehl:
+            Wenn man auf "Starte Überwachung" drückt, werden die Checkboxen ausgelesen und als GET Parameter an den Arduino gesendet
+                Beispiel: /start?ultraschall=1&beschleunigung=0&ir=1
+      Stop Befehl:
+            Wenn man auf "Überwachung Stoppen" drückt, werden alle Sensoren abgeschaltet, die Überwachung beendet und der Alarmstatus zurückgesetzt
+                Befehl: /stop
+      Status Befehl:
+            Jede Sekunde frägt die Website "/status" ab. Der Arduino muss dann eine JSON zurückschicken
+                JSON Beispiel:    {
+                                  "geraet": "BEREIT",
+                                  "ueberwachung": "AKTIV",
+                                  "alarm": false,
+                                  "ultraschall": 1,
+                                  "beschleunigung": 0,
+                                  "ir": 1
+                                  }
+            Das wird gebraucht um die Checkboxen zu aktualisieren, die Textanzeigen (über den Checkboxen) zu aktualisieren, 
+            Alarm ein oder ausblenden, Liste aktiver sensoren richtig darzustellen.
+>
