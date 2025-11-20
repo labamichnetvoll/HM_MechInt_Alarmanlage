@@ -52,30 +52,43 @@ void loop() {
         // Ende des HTTP-Headers
         if (c == '\n') {
 
-          // START
-          if (request.indexOf("GET /start?") >= 0) {
-            ueberwachungAktiv = true;
+          // DEBUG: Request anzeigen
+          Serial.println("----- HTTP Request -----");
+          Serial.println(request);
+          Serial.println("------------------------");
 
-            sensorPIR   = request.indexOf("pir=1") >= 0;
-            sensorUltra = request.indexOf("ultra=1") >= 0;
-            sensorAcc   = request.indexOf("acc=1") >= 0;
+          // 1) Status-Endpoint: nur JSON zurückgeben, KEIN HTML
+          if (request.indexOf("GET /status") >= 0) {
+            Serial.println("Status abgefragt");
+            sendStatus(client);
+          } 
+          else {
+            // 2) Start
+            if (request.indexOf("GET /start?") >= 0) {
+              ueberwachungAktiv = true;
 
-            Serial.println("=== Überwachung gestartet ===");
-            Serial.print("PIR: "); Serial.println(sensorPIR);
-            Serial.print("Ultraschall: "); Serial.println(sensorUltra);
-            Serial.print("Beschleunigung: "); Serial.println(sensorAcc);
-            Serial.println("================================");
+              sensorPIR   = request.indexOf("pir=1") >= 0;
+              sensorUltra = request.indexOf("ultra=1") >= 0;
+              sensorAcc   = request.indexOf("acc=1") >= 0;
+
+              Serial.println("=== Überwachung gestartet ===");
+              Serial.print("PIR: "); Serial.println(sensorPIR);
+              Serial.print("Ultraschall: "); Serial.println(sensorUltra);
+              Serial.print("Beschleunigung: "); Serial.println(sensorAcc);
+              Serial.println("================================");
+            }
+            // 3) Stop
+            else if (request.indexOf("GET /stop") >= 0) {
+              ueberwachungAktiv = false;
+
+              Serial.println("=== Überwachung gestoppt ===");
+              sensorPIR = sensorUltra = sensorAcc = false;
+            }
+
+            // 4) In allen anderen Fällen die Weboberfläche schicken
+            sendWebApp(client);
           }
-          // STOP
-          else if (request.indexOf("GET /stop") >= 0) {
-            ueberwachungAktiv = false;
 
-            Serial.println("=== Überwachung gestoppt ===");
-            sensorPIR = sensorUltra = sensorAcc = false;
-          }
-
-          // Webseite senden
-          sendWebApp(client);
           break;
         }
       }
@@ -95,6 +108,23 @@ void loop() {
       // Beschleunigungssensor auslesen
     }
   }
+}
+
+// JSON-Status für den Browser
+void sendStatus(WiFiClient client) {
+  client.println("HTTP/1.1 200 OK");
+  client.println("Content-Type: application/json");
+  client.println("Connection: close");
+  client.println();
+
+  String json = "{";
+  json += "\"ueberwachung\":"; json += (ueberwachungAktiv ? "true" : "false");
+  json += ",\"pir\":";         json += (sensorPIR       ? "true" : "false");
+  json += ",\"ultra\":";       json += (sensorUltra     ? "true" : "false");
+  json += ",\"acc\":";         json += (sensorAcc       ? "true" : "false");
+  json += "}";
+
+  client.println(json);
 }
 
 // Web-App senden
@@ -172,23 +202,46 @@ void sendWebApp(WiFiClient client) {
 <div class="status" id="statusText">INAKTIV</div>
 
 <script>
-function start() {
+async function ladeStatus() {
+  try {
+    const res = await fetch('/status');
+    if (!res.ok) return;
+    const data = await res.json();
+
+    // Checkboxen anhand des Arduino-Status setzen
+    document.getElementById("pir").checked   = !!data.pir;
+    document.getElementById("ultra").checked = !!data.ultra;
+    document.getElementById("acc").checked   = !!data.acc;
+
+    // Textstatus aktualisieren
+    document.getElementById("statusText").innerText =
+      data.ueberwachung ? "AKTIV" : "INAKTIV";
+  } catch (e) {
+    console.error("Status konnte nicht geladen werden:", e);
+  }
+}
+
+async function start() {
   let params = [];
 
-  if (document.getElementById("pir").checked) params.push("pir=1");
+  if (document.getElementById("pir").checked)   params.push("pir=1");
   if (document.getElementById("ultra").checked) params.push("ultra=1");
-  if (document.getElementById("acc").checked) params.push("acc=1");
+  if (document.getElementById("acc").checked)   params.push("acc=1");
 
   let query = params.join("&");
 
-  fetch('/start?' + query);
-  document.getElementById("statusText").innerText = "AKTIV";
+  await fetch('/start?' + query);
+  // danach Status nochmal vom Arduino holen
+  ladeStatus();
 }
 
-function stop() {
-  fetch('/stop');
-  document.getElementById("statusText").innerText = "INAKTIV";
+async function stop() {
+  await fetch('/stop');
+  ladeStatus();
 }
+
+// Beim Laden der Seite aktuellen Zustand vom Arduino holen
+window.addEventListener('load', ladeStatus);
 </script>
 
 </body>
