@@ -1,3 +1,5 @@
+// ERKLÄRUNG ZU GET-REQUESTS UNTER DEM CODE (AB ZEILE 255)
+
 #include <SPI.h>
 #include <WiFiNINA.h>
 
@@ -248,3 +250,32 @@ window.addEventListener('load', ladeStatus);
 </html>
 )rawliteral");
 }
+
+
+/* ERKLÄRUNG GET-REQUESTS
+
+Der Server verwendet 3 verschiedene GET-Requests
+
+1)  /start
+    Startet Überwachung und setzt die ausgewählten Sensoren
+    Beispiel: GET /start?pir=1&ultra=0&acc=1
+    (Überwachung wird gestartet, PIR ist an, ultra ist aus & acc ist an)
+
+2)  /stop
+    Deaktiviert die Überwachung und setzt alle Sensoren zurück.
+    GET /stop
+    (Überwachung und alle Sensoren AUS)
+
+3)  /status
+    Liefert den aktuellen Zustand als JSON (für Reload / neue Clients)
+    Beispiel: GET /status
+    Antwort:
+        {
+          "ueberwachung": true,
+          "pir": true,
+          "ultra": false,
+          "acc": true
+        }
+
+        Damit kann der Browser nach einem Reload die Checkboxen und den Status korrekt/aktuell anzeigen.
+*/
