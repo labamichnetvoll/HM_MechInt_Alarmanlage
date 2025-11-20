@@ -10,9 +10,9 @@
 #define BUTTON_PIN 2            // evtl. anpassen! TODO     Auswahl Pins Interrupt: 2, 3, 9, 10, 11, 13, A1, A5, A7
 #define LED_PIN 4               // evtl. anpassen! TODO
 #define PIEZZO_PIN 12            // evtl. anpassen! TODO
-#define PWM_PIN 9               // evtl. anpassen! TODO     Wichtig PWM PIN erwischen
-#define SHDN_PIN 10             // evtl. anpassen! TODO     Verstärker AN/AUS
-#define MUTE_PIN 11             // evtl. anpassen! TODO     Verstärker Mute  
+#define PWM_PIN 19               // evtl. anpassen! TODO     Wichtig PWM PIN erwischen
+//#define SHDN_PIN 10             // evtl. anpassen! TODO     Verstärker AN/AUS
+//#define MUTE_PIN 11             // evtl. anpassen! TODO     Verstärker Mute  
 
 /* Konstanten */
 #define PERIOD_UPDATE 100   // Taktlänge in ms
@@ -47,7 +47,7 @@ void loop() {
 }
 
 
-//LED blinken, Lautsprecher aktivieren, Piezo aktivieren
+//LED blinken, Lautsprecher aktivieren, (evtl. Piezo aktivieren)
 void AlarmOutput(){
 
 
@@ -66,7 +66,7 @@ void AlarmOutput(){
     digitalWrite(PIEZZO_PIN, 0);   // PIEZZEO AUS
   }
   
-  analogWrite(PWM_PIN, 50);      // 0-255: mitte am lautesten
+  analogWrite(PWM_PIN, 70);      // 0-255: mitte am lautesten
  
 
   if (takt < 20){
