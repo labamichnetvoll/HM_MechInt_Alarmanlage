@@ -1,179 +1,111 @@
-<!Erklärung zu den GET-Requests ist unter dem Code>
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Reisealarmanlage Steuerung</title>
+  <title>Reisealarmanlage</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f4ff;
-      padding: 20px;
-      text-align: center;
+    body { 
+      font-family: Arial; 
+      background:#f5f7fa; 
+      margin:0; 
+      padding:20px; 
+      text-align:center;
     }
-    h1 { color: #2c3e50; }
-    .status {
-      margin: 20px 0;
-      font-size: 18px;
+    h1 { color:#222; }
+    .sensor-box {
+      background:white;
+      padding:20px;
+      max-width:400px;
+      margin:20px auto;
+      border-radius:10px;
+      box-shadow:0 0 10px rgba(0,0,0,0.1);
+      text-align:left;
     }
-    button, label {
-      font-size: 16px;
+    .sensor-box label {
+      font-size:18px;
+      display:block;
+      margin:10px 0;
     }
     button {
-      padding: 10px 20px;
-      margin: 10px;
-      border-radius: 6px;
+      font-size:18px;
+      padding:12px 25px;
+      margin:10px;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
     }
-    .sensor-group {
-      margin: 20px 0;
-      font-size: 16px;
+    .start {
+      background:#28a745; 
+      color:white;
     }
-    .sensor-group label {
-      display: block;
-      margin: 5px 0;
+    .stop {
+      background:#dc3545; 
+      color:white;
     }
-    .alarm {
-      background-color: red;
-      color: white;
-      padding: 15px;
-      font-weight: bold;
-      display: none;
-      border-radius: 8px;
-      margin-top: 20px;
+    .status {
+      font-size:20px;
+      font-weight:bold;
+      margin-top:15px;
     }
   </style>
 </head>
 <body>
 
-  <h1>Reisealarmanlage</h1>
+<h1>Reisealarmanlage</h1>
 
-  <!-- Statusanzeigen -->
-  <div class="status">
-    <div><strong>Gerätestatus:</strong> <span id="geraetStatus">BEREIT</span></div>
-    <div><strong>Aktive Sensoren:</strong> <span id="sensorStatus">KEINE</span></div>
-    <div><strong>Überwachung:</strong> <span id="ueberwachungStatus">INAKTIV</span></div>
-  </div>
+<div class="sensor-box">
+  <label><input type="checkbox" id="pir"> PIR-Sensor</label>
+  <label><input type="checkbox" id="ultra"> Ultraschallsensor</label>
+  <label><input type="checkbox" id="acc"> Beschleunigungssensor</label>
+</div>
 
-  <!-- Sensorauswahl -->
-  <div class="sensor-group">
-    <strong>Sensoren auswählen:</strong>
-    <label>
-      <input type="checkbox" id="sensor_ultraschall">
-      Ultraschallsensor
-    </label>
-    <label>
-      <input type="checkbox" id="sensor_beschleunigung">
-      Beschleunigungssensor
-    </label>
-    <label>
-      <input type="checkbox" id="sensor_ir">
-      IR-Sensor
-    </label>
-  </div>
+<button class="start" onclick="start()">Überwachung starten</button>
+<button class="stop" onclick="stop()">Überwachung stoppen</button>
 
-  <!-- Überwachungssteuerung -->
-  <div>
-    <button onclick="starteUeberwachung()">Starte Überwachung</button>
-    <button onclick="stoppeUeberwachung()">Beende Überwachung</button>
-  </div>
+<div class="status" id="statusText">INAKTIV</div>
 
-  <!-- Alarmanzeige -->
-  <div id="alarmBox" class="alarm">🚨 ALARM!!!</div>
+<script>
+async function ladeStatus() {
+  try {
+    const res = await fetch('/status');
+    if (!res.ok) return;
+    const data = await res.json();
 
-  <script>
-    async function starteUeberwachung() {
-      // Ausgewählte Sensoren auslesen
-      const ultraschall    = document.getElementById("sensor_ultraschall").checked ? 1 : 0;
-      const beschleunigung = document.getElementById("sensor_beschleunigung").checked ? 1 : 0;
-      const ir             = document.getElementById("sensor_ir").checked ? 1 : 0;
+    // Checkboxen anhand des Arduino-Status setzen
+    document.getElementById("pir").checked   = !!data.pir;
+    document.getElementById("ultra").checked = !!data.ultra;
+    document.getElementById("acc").checked   = !!data.acc;
 
-      // Wenn gar kein Sensor gewählt ist, abbrechen
-      if (ultraschall === 0 && beschleunigung === 0 && ir === 0) {
-        alert("Bitte mindestens einen Sensor auswählen.");
-        return;
-      }
+    // Textstatus aktualisieren
+    document.getElementById("statusText").innerText =
+      data.ueberwachung ? "AKTIV" : "INAKTIV";
+  } catch (e) {
+    console.error("Status konnte nicht geladen werden:", e);
+  }
+}
 
-      const url = `/start?ultraschall=${ultraschall}&beschleunigung=${beschleunigung}&ir=${ir}`;
+async function start() {
+  let params = [];
 
-      try {
-        await fetch(url);
-        ladeStatus();
-      } catch (e) {
-        console.error(e);
-      }
-    }
+  if (document.getElementById("pir").checked)   params.push("pir=1");
+  if (document.getElementById("ultra").checked) params.push("ultra=1");
+  if (document.getElementById("acc").checked)   params.push("acc=1");
 
-    async function stoppeUeberwachung() {
-      try {
-        await fetch("/stop");
-        ladeStatus();
-      } catch (e) {
-        console.error(e);
-      }
-    }
+  let query = params.join("&");
 
-    async function ladeStatus() {
-      try {
-        const res = await fetch("/status");
-        if (!res.ok) return;
-        const data = await res.json();
+  await fetch('/start?' + query);
+  // danach Status nochmal vom Arduino holen
+  ladeStatus();
+}
 
-        document.getElementById("geraetStatus").innerText       = data.geraet       || "-";
-        document.getElementById("ueberwachungStatus").innerText = data.ueberwachung || "-";
+async function stop() {
+  await fetch('/stop');
+  ladeStatus();
+}
 
-        // Sensor-Status aus JSON übernehmen (0/1 oder true/false)
-        const ultraschallAktiv    = !!data.ultraschall;
-        const beschleunigungAktiv = !!data.beschleunigung;
-        const irAktiv             = !!data.ir;
+// Beim Laden der Seite aktuellen Zustand vom Arduino holen
+window.addEventListener('load', ladeStatus);
+</script>
 
-        document.getElementById("sensor_ultraschall").checked    = ultraschallAktiv;
-        document.getElementById("sensor_beschleunigung").checked = beschleunigungAktiv;
-        document.getElementById("sensor_ir").checked             = irAktiv;
-
-        const aktive = [];
-        if (ultraschallAktiv)    aktive.push("Ultraschallsensor");
-        if (beschleunigungAktiv) aktive.push("Beschleunigungssensor");
-        if (irAktiv)             aktive.push("IR-Sensor");
-
-        document.getElementById("sensorStatus").innerText =
-          aktive.length ? aktive.join(", ") : "KEINE";
-
-        // Alarmanzeige
-        document.getElementById("alarmBox").style.display =
-          data.alarm ? "block" : "none";
-
-      } catch (e) {
-        console.error("Status konnte nicht geladen werden:", e);
-      }
-    }
-
-    // Alle 1 s Status vom Arduino holen
-    setInterval(ladeStatus, 1000);
-    // Beim Laden der Seite einmalig Status holen
-    ladeStatus();
-  </script>
 </body>
 </html>
-
-
-<!  Erklärung zu den GET-Requests:
-      Start Befehl:
-            Wenn man auf "Starte Überwachung" drückt, werden die Checkboxen ausgelesen und als GET Parameter an den Arduino gesendet
-                Beispiel: /start?ultraschall=1&beschleunigung=0&ir=1
-      Stop Befehl:
-            Wenn man auf "Überwachung Stoppen" drückt, werden alle Sensoren abgeschaltet, die Überwachung beendet und der Alarmstatus zurückgesetzt
-                Befehl: /stop
-      Status Befehl:
-            Jede Sekunde frägt die Website "/status" ab. Der Arduino muss dann eine JSON zurückschicken
-                JSON Beispiel:    {
-                                  "geraet": "BEREIT",
-                                  "ueberwachung": "AKTIV",
-                                  "alarm": false,
-                                  "ultraschall": 1,
-                                  "beschleunigung": 0,
-                                  "ir": 1
-                                  }
-            Das wird gebraucht um die Checkboxen zu aktualisieren, die Textanzeigen (über den Checkboxen) zu aktualisieren, 
-            Alarm ein oder ausblenden, Liste aktiver sensoren richtig darzustellen.
->
