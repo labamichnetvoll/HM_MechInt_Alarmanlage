@@ -10,7 +10,7 @@
 #define BUTTON_PIN 2            // evtl. anpassen! TODO     Auswahl Pins Interrupt: 2, 3, 9, 10, 11, 13, A1, A5, A7
 #define LED_PIN 4               // evtl. anpassen! TODO
 #define PIEZZO_PIN 12            // evtl. anpassen! TODO
-#define PWM_PIN 9               // evtl. anpassen! TODO     Wichtig PWM PIN erwischen
+#define PWM_PIN 3               // evtl. anpassen! TODO     Wichtig PWM PIN erwischen
 #define SHDN_PIN 10             // evtl. anpassen! TODO     Verstärker AN/AUS
 #define MUTE_PIN 11             // evtl. anpassen! TODO     Verstärker Mute  
 
@@ -42,7 +42,7 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   AlarmOutput();
-  delay(100);
+  delay(1);
 
 }
 
@@ -58,15 +58,16 @@ void AlarmOutput(){
 
   digitalWrite(SHDN_PIN, 1);      // Verstärker AN
 
-  if (takt % 2) {
-    Serial.println("Piezzo");
+  if (takt % 4) {
+    Serial.println("Piezzo AN");
     digitalWrite(PIEZZO_PIN, 1);   // PIEZZEO AN
   }
   else {
+    Serial.println("Piezzo AUS");
     digitalWrite(PIEZZO_PIN, 0);   // PIEZZEO AUS
   }
   
-  analogWrite(PWM_PIN, 50);      // 0-255: mitte am lautesten
+  analogWrite(PWM_PIN, 100);      // 0-255: mitte am lautesten
  
 
   if (takt < 20){
