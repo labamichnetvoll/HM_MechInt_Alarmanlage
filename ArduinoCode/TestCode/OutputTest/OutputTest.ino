@@ -70,7 +70,7 @@ void AlarmOutput(){
   analogWrite(PWM_PIN, 100);      // 0-255: mitte am lautesten
  
 
-  if (takt < 410){
+  if (takt < 200){
     digitalWrite(LED_PIN, 1);   // LED AN
     digitalWrite(PIEZZO_PIN, 1);   // PIEZZO AN
   }
