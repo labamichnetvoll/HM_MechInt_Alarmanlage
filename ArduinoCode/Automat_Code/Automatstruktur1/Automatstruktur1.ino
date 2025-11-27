@@ -37,11 +37,9 @@ bool bUS_Sensor_an = 0;
 bool bA_Sensor_an = 0;
 bool bSensor_ausgeloest = 0;
 
-/* globale Sensorvariable, codeintern*/
+/* globale Sensorvariable, codeintern */
 long ldistultraschallvgl = 0;
 
-<<<<<<< HEAD
-=======
 // Webserver / WLAN
 const char ssid[] = "ReiseAlarm_AP";     // Name des WLANs
 const char pass[] = "12345678";          // Passwort (mind. 8 Zeichen)
@@ -51,11 +49,10 @@ WiFiServer server(80);
 // Zustand nur für Web-Anzeige (Start/Stop)
 bool ueberwachungAktiv = false;
 
->>>>>>> 0ff5d37ba7766f9eb0e54b2af30d6bd7f6ff3b7a
-/* Konstruktor CPP Klassen*/
+/* Konstruktor CPP Klassen */
 Ultrasonic ultrasonic(ULTRASONIC_PIN_NR);
 
-/* Funktionsprototypen*/
+/* Funktionsprototypen */
 void AlarmOutput();
 void WebServer_begin();
 void WebServer_handleClient();
@@ -77,9 +74,6 @@ void setup() {
   Serial.println("Started.");
 
   /* IO-Init */
-=======
-  /* IO-Init*/
->>>>>>> 0ff5d37ba7766f9eb0e54b2af30d6bd7f6ff3b7a
   pinMode(INFRAROT_PIN_NR, INPUT);
   pinMode(LED_PIN, OUTPUT);
   pinMode(PIEZZO_PIN, OUTPUT);
@@ -101,11 +95,6 @@ void setup() {
   /* Automat-Init */
   Zustand = Start;        //Zustand auf Start
   ulLastupdate = millis();  //Taktzähler zurücksetzen
-=======
-  /* Automat-Init*/
-  Zustand = Start;        // Zustand auf Start
-  ulLastupdate = millis();  // Taktzähler zurücksetzen
->>>>>>> 0ff5d37ba7766f9eb0e54b2af30d6bd7f6ff3b7a
 
   // Webserver starten (Access Point + HTTP-Server)
   WebServer_begin();
@@ -119,7 +108,6 @@ void loop() {
   // HTTP-Anfragen vom Web-Client bearbeiten
   WebServer_handleClient();
   
-<<<<<<< HEAD
   if (millis() - ulLastupdate > PERIOD_UPDATE)  {   //if-Abfrage funktioniert für mindestens 7 Wochen, dann Overflow möglich
 
     ulLastupdate = millis();  //Taktzähler zurücksetzen
@@ -151,7 +139,6 @@ void loop() {
         break;
 
       case Aktiv:
-<<<<<<< HEAD
       //Infrarotsensor
         if(bIR_Sensor_an){
           //Sensor abfragen
@@ -176,19 +163,11 @@ void loop() {
         break;
 
       case Alarm:
-<<<<<<< HEAD
-        //LED blinken, Piezo aktivieren
-        //Web UI kann bSensor_ausgeloest auf 0 setzen
-        AlarmOutput();
-
-        if(!bSensor_ausgeloest){
-=======
-        // LED blinken, Lautsprecher aktivieren, Piezo aktivieren
+        // LED blinken, Piezo aktivieren
         // Web UI kann bSensor_ausgeloest auf 0 setzen (z. B. später über extra Button)
         AlarmOutput();
 
         if (!bSensor_ausgeloest) {
->>>>>>> 0ff5d37ba7766f9eb0e54b2af30d6bd7f6ff3b7a
           Zustand = Start;
         }
         break;
@@ -228,34 +207,55 @@ void AlarmOutput(){
   }
   else takt = 0;
   takt++;
-<<<<<<< HEAD
-=======
 }
 
-// Ultraschall – simple Beispielimplementierung
-long ReturnUltraschall() {
-  long d = ultrasonic.read();   // hängt von Bibliothek ab
-  // Serial.print("Ultraschall: "); Serial.println(d);
-  return d;
+/**
+ * @brief Gibt die gemessene Entfernung in cm zurück
+*/
+long ReturnUltraschall()  {
+  //Drift berücksichtigen!!!
+  return ultrasonic.MeasureInCentimeters(/*TimeOUT in microsek */ );   // Für Initialisierung
 }
 
-// Infrarot-Sensor – HIGH = ausgelöst
+/**
+ * @brief Gibt Status von IR_Sensor zurück
+*/
 bool ReturnInfrarot() {
-  int val = digitalRead(INFRAROT_PIN_NR);
-  return (val == HIGH);
+  return digitalRead(INFRAROT_PIN_NR);
 }
 
-// Beschleunigungssensor – Schwellwert-Beispiel
+/**
+ * @brief Ließt Beschleunigungssensor aus
+ * Rückgabe:  1 bei Bewegung erkannt,  0 wenn keine Bewegung erkannt
+ *
+ * @TODO: Sensitivität kontrollieren & anpassen?!
+*/
 bool ReturnAcceleration() {
-  float x, y, z;
   if (IMU.accelerationAvailable()) {
-    IMU.readAcceleration(x, y, z);
-    // einfache Schwelle
-    if (fabs(x) > 0.5 || fabs(y) > 0.5 || fabs(z) > 0.5) {
-      return true;
+    IMU.readAcceleration(acc_x, acc_y, acc_z);
+
+    if (acc_x - acc_x_old > SENSI || acc_x - acc_x_old < -SENSI) {
+      Serial.print("X:");
+      Serial.println(acc_x, 5);   //Debug-Text
+      acc_x_old = acc_x;
+      return 1;
+    }
+    if (acc_y - acc_y_old > SENSI || acc_y - acc_y_old < -SENSI) {
+      Serial.print("Y:");
+      Serial.println(acc_y, 5);   //Debug-Text
+      acc_y_old = acc_y;
+      return 1;
+    }
+    if (acc_z - acc_z_old > SENSI || acc_z - acc_z_old < -SENSI) {
+      Serial.print("Z:");
+      Serial.println(acc_z, 5);   //Debug-Text
+      acc_z_old = acc_z;
+      return 1;
     }
   }
-  return false;
+  else Serial.println("WTF");
+
+  return 0;
 }
 
 /* =======================================================================
@@ -477,5 +477,4 @@ window.addEventListener('load', ladeStatus);
 </body>
 </html>
 )rawliteral");
->>>>>>> 0ff5d37ba7766f9eb0e54b2af30d6bd7f6ff3b7a
 }
