@@ -1,26 +1,28 @@
-# Projekt Alarmanlage 
+# Projekt Alarmanlage Stand 27.11.23
 > [!NOTE]
 > [Aktuelle Doku HIER!](https://github.com/labamichnetvoll/HM_MechInt_Alarmanlage/tree/doku_github)
 
 
 Dieses GitHub Repository dient als Code Austausch Plattform
 
-Folgende Unterordner sind geplant:
-1. ArduinoCode
-2. Web-App (html - css) & Backend WebServer
-3. Schaltplan (KiCAD 9.x)
+> [!IMPORTANT]
+> Bitte nur noch im [`final_candidat`](https://github.com/labamichnetvoll/HM_MechInt_Alarmanlage/tree/final_candidat) branch arbeiten  
+> Mit Außnahme der Doku bzw. des Schaltplans in dem jeweiligen Branch
 
 
 ## Branches:
 
-| Branch                | Kurzbeschreibung                                              |
-| ---                   | ---                                                           |
-| `main`                | Hier werden alle Änderungen nach und nach eingebettet         |
-| `DEV_Sensorik`        | Entwicklungsbranch für die Sensorik-Programmierung            |
-| `Leoline99-patch-2`   | Programlogik                                                  |
-| `dev_Schaltplan`      | Schaltplan Erstellung mit KiCAD v9.0.5 als Bauanleitung       |
-| `dev_WebApp`          | WebUI Entwicklung & Arduino "Backend"                         |
-| `doku_github`         | Dokumentation auf GitHub (z.B. Strukturerläuterung, usw..)    |
+| Branch                  | Kurzbeschreibung                                              | Bemerkung |
+| ---                     | ---                                                           | ---       |
+| `main`                  | Hier werden alle Änderungen nach und nach eingebettet         | 
+| <mark>`final_candidat`  | <mark> Finalisierung des Codes, alles zusammen                | <mark>**NUR hier Arbeiten**</mark>
+| `DEV_Sensorik`          | Entwicklungsbranch für die Sensorik-Programmierung            | abgeschlossen
+| `Leoline99-patch-2`     | Programlogik                                                  | nicht mehr up-to-date
+| `dev_Schaltplan`        | Schaltplan Erstellung mit KiCAD v9.0.5 als Bauanleitung       | 
+| `dev_WebApp`            | WebUI Entwicklung & Arduino "Backend"                         | abgeschlossen 
+| `doku_github`           | Dokumentation auf GitHub (z.B. Strukturerläuterung, usw..)    | *weiter aktiv*
+| `Aktoren_Tests`         | Test der Aktoren ->                                           | abgeschlossen |
+
 
 > [!TIP]
 > Im `Main`-Branch können **nicht direkt** Änderungen vorgenommen werden.  
