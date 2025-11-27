@@ -2,23 +2,16 @@
 
 #include <SPI.h>
 #include <WiFiNINA.h>
+#include "WebServer.h"
 
 const char ssid[] = "ReiseAlarm_AP";     // Name des WLANs
 const char pass[] = "12345678";          // Passwort (mind. 8 Zeichen)
 
 WiFiServer server(80);
 
-// Zustände
 bool ueberwachungAktiv = false;
 
-// Zustände der Sensoren
-bool sensorPIR = false;
-bool sensorUltra = false;
-bool sensorAcc = false;
-
-void setup() {
-  Serial.begin(9600);
-  while (!Serial);
+void WebServer_begin() {
 
   if (WiFi.status() == WL_NO_MODULE) {
     Serial.println("WiFi-Modul nicht erkannt!");
@@ -42,7 +35,7 @@ void setup() {
   server.begin();
 }
 
-void loop() {
+void WebServer_handleClient() {
   WiFiClient client = server.available();
   if (client) {
     String request = "";
@@ -51,43 +44,40 @@ void loop() {
         char c = client.read();
         request += c;
 
-        // Ende des HTTP-Headers
         if (c == '\n') {
-
-          // DEBUG: Request anzeigen
           Serial.println("----- HTTP Request -----");
           Serial.println(request);
           Serial.println("------------------------");
 
-          // 1) Status-Endpoint: nur JSON zurückgeben, KEIN HTML
           if (request.indexOf("GET /status") >= 0) {
             Serial.println("Status abgefragt");
             sendStatus(client);
           } 
           else {
-            // 2) Start
             if (request.indexOf("GET /start?") >= 0) {
               ueberwachungAktiv = true;
 
-              sensorPIR   = request.indexOf("pir=1") >= 0;
-              sensorUltra = request.indexOf("ultra=1") >= 0;
-              sensorAcc   = request.indexOf("acc=1") >= 0;
+              bIR_Sensor_an =   request.indexOf("pir=1")   >= 0;
+              bUS_Sensor_an =   request.indexOf("ultra=1") >= 0;
+              bA_Sensor_an  =   request.indexOf("acc=1")   >= 0;
 
               Serial.println("=== Überwachung gestartet ===");
-              Serial.print("PIR: "); Serial.println(sensorPIR);
-              Serial.print("Ultraschall: "); Serial.println(sensorUltra);
-              Serial.print("Beschleunigung: "); Serial.println(sensorAcc);
+              Serial.print("PIR: ");   Serial.println(bIR_Sensor_an);
+              Serial.print("Ultra: "); Serial.println(bUS_Sensor_an);
+              Serial.print("Acc: ");   Serial.println(bA_Sensor_an);
               Serial.println("================================");
-            }
-            // 3) Stop
+              }
             else if (request.indexOf("GET /stop") >= 0) {
               ueberwachungAktiv = false;
 
+              bIR_Sensor_an = false;
+              bUS_Sensor_an = false;
+              bA_Sensor_an  = false;
+              bSensor_ausgeloest = false;   // Alarm zurücksetzen
+
               Serial.println("=== Überwachung gestoppt ===");
-              sensorPIR = sensorUltra = sensorAcc = false;
             }
 
-            // 4) In allen anderen Fällen die Weboberfläche schicken
             sendWebApp(client);
           }
 
@@ -96,19 +86,6 @@ void loop() {
       }
     }
     client.stop();
-  }
-
-  // --- HIER WÜRDEST DU SPÄTER SENSORLOGIK EINBAUEN ---
-  if (ueberwachungAktiv) {
-    if (sensorPIR) {
-      // PIR auslesen
-    }
-    if (sensorUltra) {
-      // Ultraschall auslesen
-    }
-    if (sensorAcc) {
-      // Beschleunigungssensor auslesen
-    }
   }
 }
 
@@ -120,11 +97,11 @@ void sendStatus(WiFiClient client) {
   client.println();
 
   String json = "{";
-  json += "\"ueberwachung\":"; json += (ueberwachungAktiv ? "true" : "false");
-  json += ",\"pir\":";         json += (sensorPIR       ? "true" : "false");
-  json += ",\"ultra\":";       json += (sensorUltra     ? "true" : "false");
-  json += ",\"acc\":";         json += (sensorAcc       ? "true" : "false");
-  json += "}";
+json += "\"ueberwachung\":"; json += (ueberwachungAktiv ? "true" : "false");
+json += ",\"pir\":";         json += (bIR_Sensor_an    ? "true" : "false");
+json += ",\"ultra\":";       json += (bUS_Sensor_an    ? "true" : "false");
+json += ",\"acc\":";         json += (bA_Sensor_an     ? "true" : "false");
+json += "}";
 
   client.println(json);
 }
