@@ -3,13 +3,13 @@
  * https://docs.arduino.cc/tutorials/nano-33-iot/imu-accelerometer/
  */
 
-
-
 /* Bibliotheken Einbinden */
 #include <Arduino.h>
-#include "Ultrasonic.h"            //fertige Bibliothek für Ultraschall Sensor
+#include "Ultrasonic.h"            // fertige Bibliothek für Ultraschall Sensor
 #include <Arduino_LSM6DS3.h>       // IMU
-// #include "WebServer.h"             // Web Anteil - Später einbinden
+#include <SPI.h>                   // für WiFi
+#include <WiFiNINA.h>              // WLAN / Webserver
+//#include "WebServer.h"           // Web Anteil - aktuell nicht benutzt
 
 /* PIN Nummer - Defintionen */
 //Auswahl Pins Interrupt: 2, 3, 9, 10, 11, 13, A1, A5, A7
@@ -40,12 +40,36 @@ bool bSensor_ausgeloest = 0;
 /* globale Sensorvariable, codeintern*/
 long ldistultraschallvgl = 0;
 
+<<<<<<< HEAD
+=======
+// Webserver / WLAN
+const char ssid[] = "ReiseAlarm_AP";     // Name des WLANs
+const char pass[] = "12345678";          // Passwort (mind. 8 Zeichen)
+
+WiFiServer server(80);
+
+// Zustand nur für Web-Anzeige (Start/Stop)
+bool ueberwachungAktiv = false;
+
+>>>>>>> 0ff5d37ba7766f9eb0e54b2af30d6bd7f6ff3b7a
 /* Konstruktor CPP Klassen*/
 Ultrasonic ultrasonic(ULTRASONIC_PIN_NR);
 
 /* Funktionsprototypen*/
 void AlarmOutput();
+void WebServer_begin();
+void WebServer_handleClient();
+void sendStatus(WiFiClient client);
+void sendWebApp(WiFiClient client);
 
+// Sensor-Funktionen – hier als Prototypen, unten implementiert:
+long ReturnUltraschall();
+bool ReturnInfrarot();
+bool ReturnAcceleration();
+
+/* =======================================================================
+ *  SETUP
+ * ======================================================================= */
 void setup() {
 
   Serial.begin(115200);
@@ -53,6 +77,9 @@ void setup() {
   Serial.println("Started.");
 
   /* IO-Init */
+=======
+  /* IO-Init*/
+>>>>>>> 0ff5d37ba7766f9eb0e54b2af30d6bd7f6ff3b7a
   pinMode(INFRAROT_PIN_NR, INPUT);
   pinMode(LED_PIN, OUTPUT);
   pinMode(PIEZZO_PIN, OUTPUT);
@@ -68,30 +95,39 @@ void setup() {
 
   //Test ob Ultraschall Sensor angeschlossen und rdy
   if (ReturnUltraschall() == 0){
-    Serial.println("Ultraschall defekt");
+    Serial.println("Ultraschall defekt (Distanz = 0)");
   }
 
   /* Automat-Init */
   Zustand = Start;        //Zustand auf Start
   ulLastupdate = millis();  //Taktzähler zurücksetzen
+=======
+  /* Automat-Init*/
+  Zustand = Start;        // Zustand auf Start
+  ulLastupdate = millis();  // Taktzähler zurücksetzen
+>>>>>>> 0ff5d37ba7766f9eb0e54b2af30d6bd7f6ff3b7a
 
+  // Webserver starten (Access Point + HTTP-Server)
+  WebServer_begin();
 }
 
-
+/* =======================================================================
+ *  LOOP
+ * ======================================================================= */
 void loop() {
   
+  // HTTP-Anfragen vom Web-Client bearbeiten
+  WebServer_handleClient();
+  
+<<<<<<< HEAD
   if (millis() - ulLastupdate > PERIOD_UPDATE)  {   //if-Abfrage funktioniert für mindestens 7 Wochen, dann Overflow möglich
 
     ulLastupdate = millis();  //Taktzähler zurücksetzen
 
-    ReturnAcceleration();   //TEST
-
-    //Serial.print("Aktueller Zustand: ");
-    //Serial.println(Zustand);
+    ReturnAcceleration();   // TEST
 
     //Zustandswechsel hier
     switch(Zustand){
-      
 
       case Start:
         // Alarm ausschalten
@@ -100,21 +136,22 @@ void loop() {
         bIR_Sensor_an = 0;
         bUS_Sensor_an = 0;
         bA_Sensor_an = 0;
+        bSensor_ausgeloest = 0;
+
         Zustand = Sensorauswahl;
         break;
       
       case Sensorauswahl:
-        //Diplay zeigt "Bereit"
-        // (Sensorvariablen lesen aus WebUI änderungen):
-        if(bIR_Sensor_an || bUS_Sensor_an || bA_Sensor_an){
+        // Display zeigt "Bereit"
+        // (Sensorvariablen werden durch WebUI gesetzt)
+        if (bIR_Sensor_an || bUS_Sensor_an || bA_Sensor_an) {
           ldistultraschallvgl = ReturnUltraschall();
           Zustand = Aktiv;
         }
-
-        
         break;
 
       case Aktiv:
+<<<<<<< HEAD
       //Infrarotsensor
         if(bIR_Sensor_an){
           //Sensor abfragen
@@ -139,11 +176,19 @@ void loop() {
         break;
 
       case Alarm:
+<<<<<<< HEAD
         //LED blinken, Piezo aktivieren
         //Web UI kann bSensor_ausgeloest auf 0 setzen
         AlarmOutput();
 
         if(!bSensor_ausgeloest){
+=======
+        // LED blinken, Lautsprecher aktivieren, Piezo aktivieren
+        // Web UI kann bSensor_ausgeloest auf 0 setzen (z. B. später über extra Button)
+        AlarmOutput();
+
+        if (!bSensor_ausgeloest) {
+>>>>>>> 0ff5d37ba7766f9eb0e54b2af30d6bd7f6ff3b7a
           Zustand = Start;
         }
         break;
@@ -152,9 +197,8 @@ void loop() {
         //Nur zur Fehlerbehebung, immer zu Start wechseln
         Zustand = Start;
         break;
-      }
+    }
   }
-    
     
   if (ulLastupdate > millis() ) {    //Bei Overflow: ulLastupdate neu setzen, um Takt wiederherzustellen
     ulLastupdate = millis();
@@ -162,7 +206,9 @@ void loop() {
   
 }
 
-// Funktionen hier
+/* =======================================================================
+ *  Funktionen: Alarm und Sensoren
+ * ======================================================================= */
 
 /* LED blinken, Piezo aktivieren */
 void AlarmOutput(){
@@ -182,4 +228,254 @@ void AlarmOutput(){
   }
   else takt = 0;
   takt++;
+<<<<<<< HEAD
+=======
+}
+
+// Ultraschall – simple Beispielimplementierung
+long ReturnUltraschall() {
+  long d = ultrasonic.read();   // hängt von Bibliothek ab
+  // Serial.print("Ultraschall: "); Serial.println(d);
+  return d;
+}
+
+// Infrarot-Sensor – HIGH = ausgelöst
+bool ReturnInfrarot() {
+  int val = digitalRead(INFRAROT_PIN_NR);
+  return (val == HIGH);
+}
+
+// Beschleunigungssensor – Schwellwert-Beispiel
+bool ReturnAcceleration() {
+  float x, y, z;
+  if (IMU.accelerationAvailable()) {
+    IMU.readAcceleration(x, y, z);
+    // einfache Schwelle
+    if (fabs(x) > 0.5 || fabs(y) > 0.5 || fabs(z) > 0.5) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/* =======================================================================
+ *  WEB: Access Point + HTTP-Handler
+ * ======================================================================= */
+
+void WebServer_begin() {
+
+  if (WiFi.status() == WL_NO_MODULE) {
+    Serial.println("WiFi-Modul nicht erkannt!");
+    while (true);
+  }
+
+  Serial.println("Starte Access Point...");
+  int status = WiFi.beginAP(ssid, pass);
+  if (status != WL_AP_LISTENING) {
+    Serial.println("Fehler beim Starten des Access Points.");
+    while (true);
+  }
+
+  delay(5000);
+
+  IPAddress ip = WiFi.localIP();
+  Serial.println("Access Point aktiv!");
+  Serial.print("IP Adresse: ");
+  Serial.println(ip);
+
+  server.begin();
+}
+
+void WebServer_handleClient() {
+  WiFiClient client = server.available();
+  if (client) {
+    String request = "";
+    while (client.connected()) {
+      if (client.available()) {
+        char c = client.read();
+        request += c;
+
+        if (c == '\n') {
+          Serial.println("----- HTTP Request -----");
+          Serial.println(request);
+          Serial.println("------------------------");
+
+          if (request.indexOf("GET /status") >= 0) {
+            Serial.println("Status abgefragt");
+            sendStatus(client);
+          } 
+          else {
+            if (request.indexOf("GET /start?") >= 0) {
+              ueberwachungAktiv = true;
+
+              bIR_Sensor_an =   request.indexOf("pir=1")   >= 0;
+              bUS_Sensor_an =   request.indexOf("ultra=1") >= 0;
+              bA_Sensor_an  =   request.indexOf("acc=1")   >= 0;
+
+              Serial.println("=== Überwachung gestartet ===");
+              Serial.print("PIR: ");   Serial.println(bIR_Sensor_an);
+              Serial.print("Ultra: "); Serial.println(bUS_Sensor_an);
+              Serial.print("Acc: ");   Serial.println(bA_Sensor_an);
+              Serial.println("================================");
+            }
+            else if (request.indexOf("GET /stop") >= 0) {
+              ueberwachungAktiv = false;
+
+              bIR_Sensor_an = false;
+              bUS_Sensor_an = false;
+              bA_Sensor_an  = false;
+              bSensor_ausgeloest = false;   // Alarm zurücksetzen
+
+              Serial.println("=== Überwachung gestoppt ===");
+            }
+
+            sendWebApp(client);
+          }
+
+          break;
+        }
+      }
+    }
+    client.stop();
+  }
+}
+
+/* JSON-Status für den Browser */
+void sendStatus(WiFiClient client) {
+  client.println("HTTP/1.1 200 OK");
+  client.println("Content-Type: application/json");
+  client.println("Connection: close");
+  client.println();
+
+  String json = "{";
+  json += "\"ueberwachung\":"; json += (ueberwachungAktiv ? "true" : "false");
+  json += ",\"pir\":";         json += (bIR_Sensor_an    ? "true" : "false");
+  json += ",\"ultra\":";       json += (bUS_Sensor_an    ? "true" : "false");
+  json += ",\"acc\":";         json += (bA_Sensor_an     ? "true" : "false");
+  json += "}";
+
+  client.println(json);
+}
+
+/* Web-App senden */
+void sendWebApp(WiFiClient client) {
+  client.println("HTTP/1.1 200 OK");
+  client.println("Content-Type: text/html");
+  client.println("Connection: close");
+  client.println();
+
+  client.println(R"rawliteral(
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Reisealarmanlage</title>
+  <style>
+    body { 
+      font-family: Arial; 
+      background:#f5f7fa; 
+      margin:0; 
+      padding:20px; 
+      text-align:center;
+    }
+    h1 { color:#222; }
+    .sensor-box {
+      background:white;
+      padding:20px;
+      max-width:400px;
+      margin:20px auto;
+      border-radius:10px;
+      box-shadow:0 0 10px rgba(0,0,0,0.1);
+      text-align:left;
+    }
+    .sensor-box label {
+      font-size:18px;
+      display:block;
+      margin:10px 0;
+    }
+    button {
+      font-size:18px;
+      padding:12px 25px;
+      margin:10px;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+    }
+    .start {
+      background:#28a745; 
+      color:white;
+    }
+    .stop {
+      background:#dc3545; 
+      color:white;
+    }
+    .status {
+      font-size:20px;
+      font-weight:bold;
+      margin-top:15px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Reisealarmanlage</h1>
+
+<div class="sensor-box">
+  <label><input type="checkbox" id="pir"> PIR-Sensor</label>
+  <label><input type="checkbox" id="ultra"> Ultraschallsensor</label>
+  <label><input type="checkbox" id="acc"> Beschleunigungssensor</label>
+</div>
+
+<button class="start" onclick="start()">Überwachung starten</button>
+<button class="stop" onclick="stop()">Überwachung stoppen</button>
+
+<div class="status" id="statusText">INAKTIV</div>
+
+<script>
+async function ladeStatus() {
+  try {
+    const res = await fetch('/status');
+    if (!res.ok) return;
+    const data = await res.json();
+
+    // Checkboxen anhand des Arduino-Status setzen
+    document.getElementById("pir").checked   = !!data.pir;
+    document.getElementById("ultra").checked = !!data.ultra;
+    document.getElementById("acc").checked   = !!data.acc;
+
+    // Textstatus aktualisieren
+    document.getElementById("statusText").innerText =
+      data.ueberwachung ? "AKTIV" : "INAKTIV";
+  } catch (e) {
+    console.error("Status konnte nicht geladen werden:", e);
+  }
+}
+
+async function start() {
+  let params = [];
+
+  if (document.getElementById("pir").checked)   params.push("pir=1");
+  if (document.getElementById("ultra").checked) params.push("ultra=1");
+  if (document.getElementById("acc").checked)   params.push("acc=1");
+
+  let query = params.join("&");
+
+  await fetch('/start?' + query);
+  // danach Status nochmal vom Arduino holen
+  ladeStatus();
+}
+
+async function stop() {
+  await fetch('/stop');
+  ladeStatus();
+}
+
+// Beim Laden der Seite aktuellen Zustand vom Arduino holen
+window.addEventListener('load', ladeStatus);
+</script>
+
+</body>
+</html>
+)rawliteral");
+>>>>>>> 0ff5d37ba7766f9eb0e54b2af30d6bd7f6ff3b7a
 }
