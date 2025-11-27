@@ -11,19 +11,15 @@
 #include <Arduino_LSM6DS3.h>       // IMU
 // #include "WebServer.h"             // Web Anteil - Später einbinden
 
-/* PIN Nummer - Defintionen*/
+/* PIN Nummer - Defintionen */
+//Auswahl Pins Interrupt: 2, 3, 9, 10, 11, 13, A1, A5, A7
 #define ULTRASONIC_PIN_NR 7     // evtl. anpassen! TODO   
 #define INFRAROT_PIN_NR 6       // evtl. anpassen! TODO
-#define BUTTON_PIN 2            // evtl. anpassen! TODO     Auswahl Pins Interrupt: 2, 3, 9, 10, 11, 13, A1, A5, A7
-#define LED_PIN 4               // evtl. anpassen! TODO
-#define PIEZZO_PIN 5            // evtl. anpassen! TODO
-#define PWM_PIN 9               // evtl. anpassen! TODO     Wichtig PWM PIN erwischen
-#define SHDN_PIN 10             // evtl. anpassen! TODO     Verstärker AN/AUS
-#define MUTE_PIN 11             // evtl. anpassen! TODO     Verstärker Mute  
+#define LED_PIN 4               // Pin D4
+#define PIEZZO_PIN 5            // Pin D5 !! Vin benutzen, nicht 5V !!
 
 /* Konstanten */
 #define PERIOD_UPDATE 100   // Taktlänge in ms
-
 
 /* Variablen für Automaten */
 unsigned long ulLastupdate = 0;
@@ -44,7 +40,6 @@ bool bSensor_ausgeloest = 0;
 /* globale Sensorvariable, codeintern*/
 long ldistultraschallvgl = 0;
 
-
 /* Konstruktor CPP Klassen*/
 Ultrasonic ultrasonic(ULTRASONIC_PIN_NR);
 
@@ -54,20 +49,15 @@ void AlarmOutput();
 void setup() {
 
   Serial.begin(115200);
-  while (!Serial);          //TODO Später auskommentieren!
+  //while (!Serial);          //TODO Später auskommentieren!
   Serial.println("Started.");
-  /* IO-Init*/
+
+  /* IO-Init */
   pinMode(INFRAROT_PIN_NR, INPUT);
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
-  //attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), ISR_NAME??, CHANGE);   //ISR Funktion hinzufügen
   pinMode(LED_PIN, OUTPUT);
   pinMode(PIEZZO_PIN, OUTPUT);
-  pinMode(PWM_PIN, OUTPUT);
-  pinMode(SHDN_PIN, OUTPUT);      
 
-  digitalWrite(SHDN_PIN, 0);    // Deaktiviert Verstärker Modul
-
-  /* IMU Init*/
+  /* IMU Init */
   if (!IMU.begin()){
     Serial.println("Failed to initialize IMU!");
     while (1);    // aus ExampleCode - Simple Accelerometer
@@ -81,12 +71,7 @@ void setup() {
     Serial.println("Ultraschall defekt");
   }
 
-
-  // Lautsprecher Konfig
-
-
-
-  /* Automat-Init*/
+  /* Automat-Init */
   Zustand = Start;        //Zustand auf Start
   ulLastupdate = millis();  //Taktzähler zurücksetzen
 
@@ -95,7 +80,6 @@ void setup() {
 
 void loop() {
   
-
   if (millis() - ulLastupdate > PERIOD_UPDATE)  {   //if-Abfrage funktioniert für mindestens 7 Wochen, dann Overflow möglich
 
     ulLastupdate = millis();  //Taktzähler zurücksetzen
@@ -111,9 +95,7 @@ void loop() {
 
       case Start:
         // Alarm ausschalten
-        analogWrite(PWM_PIN, 0);
-        digitalWrite(PWM_PIN, 0); // safety first
-        digitalWrite(SHDN_PIN, 0);      // Verstärker AUS
+        
         //Sensoren und Aktoren Initialisieren
         bIR_Sensor_an = 0;
         bUS_Sensor_an = 0;
@@ -133,34 +115,33 @@ void loop() {
         break;
 
       case Aktiv:
+      //Infrarotsensor
         if(bIR_Sensor_an){
           //Sensor abfragen
           bSensor_ausgeloest = ReturnInfrarot();
-
         }
+        //Ultraschallsensor
         if(bUS_Sensor_an){
           //Sensor abfragen & auswerten
           if ( ReturnUltraschall() - ldistultraschallvgl > 5 || ReturnUltraschall() - ldistultraschallvgl < -5 )  {
             bSensor_ausgeloest = 1;
           }
-          
         }
+        //Beschleunigungssensor
         if(bA_Sensor_an){
           //Sensor abfragen
           bSensor_ausgeloest = ReturnAcceleration();
         }
-
+        //Falls ein Sensor auslöst
         if(bSensor_ausgeloest){
           Zustand = Alarm;
         }
         break;
 
       case Alarm:
-        //LED blinken, Lautsprecher aktivieren, Piezo aktivieren
+        //LED blinken, Piezo aktivieren
         //Web UI kann bSensor_ausgeloest auf 0 setzen
-
         AlarmOutput();
-
 
         if(!bSensor_ausgeloest){
           Zustand = Start;
@@ -179,37 +160,26 @@ void loop() {
     ulLastupdate = millis();
   }
   
-
 }
 
 // Funktionen hier
 
-//LED blinken, Lautsprecher aktivieren, Piezo aktivieren
+/* LED blinken, Piezo aktivieren */
 void AlarmOutput(){
 
-  volatile unsigned long takt = 0;
-  digitalWrite(SHDN_PIN, 1);      // Verstärker AN
-
-  if (takt % 2) digitalWrite(PIEZZO_PIN, 1);   // PIEZZEO AN
-  else digitalWrite(PIEZZO_PIN, 0);   // PIEZZEO AUS
-
+  static unsigned long takt = 0;
+  Serial.println(takt);
   
-  analogWrite(PWM_PIN, 50);      // 0-255: mitte am lautesten
- 
-
-  if (takt < 20){
-    digitalWrite(LED_PIN, 1);   // LED AN
-    
+  if (takt < 200){
+    digitalWrite(LED_PIN, 1);       // LED AN
+    digitalWrite(PIEZZO_PIN, 1);    // PIEZZO AN
+    Serial.println(AN);             // Debug
   }
-  else if (takt < 40){
-    digitalWrite(LED_PIN, 0);   // LED AUS    
-
+  else if (takt < 400){
+    digitalWrite(LED_PIN, 0);       // LED AUS    
+    digitalWrite(PIEZZO_PIN, 0);    // PIEZZO AUS
+    Serial.println(AUS);            // Debug
   }
-  else {
-    takt = 0;
-  }
-  
+  else takt = 0;
   takt++;
-
-
 }
