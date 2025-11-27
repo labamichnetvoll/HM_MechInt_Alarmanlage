@@ -3,15 +3,13 @@
  * https://docs.arduino.cc/tutorials/nano-33-iot/imu-accelerometer/
  */
 
-
-
 /* Bibliotheken Einbinden */
 #include <Arduino.h>
-#include "Ultrasonic.h"            //fertige Bibliothek für Ultraschall Sensor
+#include "Ultrasonic.h"            // fertige Bibliothek für Ultraschall Sensor
 #include <Arduino_LSM6DS3.h>       // IMU
 #include <SPI.h>                   // für WiFi
 #include <WiFiNINA.h>              // WLAN / Webserver
-//#include "WebServer.h"             // Web Anteil - Später einbinden
+//#include "WebServer.h"           // Web Anteil - aktuell nicht benutzt
 
 /* PIN Nummer - Defintionen*/
 #define ULTRASONIC_PIN_NR 7     // evtl. anpassen! TODO   
@@ -25,7 +23,6 @@
 
 /* Konstanten */
 #define PERIOD_UPDATE 100   // Taktlänge in ms
-
 
 /* Variablen für Automaten */
 unsigned long ulLastupdate = 0;
@@ -45,6 +42,7 @@ bool bSensor_ausgeloest = 0;
 
 /* globale Sensorvariable, codeintern*/
 long ldistultraschallvgl = 0;
+
 // Webserver / WLAN
 const char ssid[] = "ReiseAlarm_AP";     // Name des WLANs
 const char pass[] = "12345678";          // Passwort (mind. 8 Zeichen)
@@ -53,7 +51,6 @@ WiFiServer server(80);
 
 // Zustand nur für Web-Anzeige (Start/Stop)
 bool ueberwachungAktiv = false;
-
 
 /* Konstruktor CPP Klassen*/
 Ultrasonic ultrasonic(ULTRASONIC_PIN_NR);
@@ -65,11 +62,20 @@ void WebServer_handleClient();
 void sendStatus(WiFiClient client);
 void sendWebApp(WiFiClient client);
 
+// Sensor-Funktionen – hier als Prototypen, unten implementiert:
+long ReturnUltraschall();
+bool ReturnInfrarot();
+bool ReturnAcceleration();
+
+/* =======================================================================
+ *  SETUP
+ * ======================================================================= */
 void setup() {
 
   Serial.begin(115200);
   while (!Serial);          //TODO Später auskommentieren!
   Serial.println("Started.");
+
   /* IO-Init*/
   pinMode(INFRAROT_PIN_NR, INPUT);
   pinMode(BUTTON_PIN, INPUT_PULLUP);
@@ -92,145 +98,159 @@ void setup() {
 
   //Test ob Ultraschall Sensor angeschlossen und rdy
   if (ReturnUltraschall() == 0){
-    Serial.println("Ultraschall defekt");
+    Serial.println("Ultraschall defekt (Distanz = 0)");
   }
 
-
-  // Lautsprecher Konfig
-
-
-
   /* Automat-Init*/
-  Zustand = Start;        //Zustand auf Start
-  ulLastupdate = millis();  //Taktzähler zurücksetzen
+  Zustand = Start;        // Zustand auf Start
+  ulLastupdate = millis();  // Taktzähler zurücksetzen
 
   // Webserver starten (Access Point + HTTP-Server)
   WebServer_begin();
 }
 
-
+/* =======================================================================
+ *  LOOP
+ * ======================================================================= */
 void loop() {
 
   // HTTP-Anfragen vom Web-Client bearbeiten
   WebServer_handleClient();
   
-  if (millis() - ulLastupdate > PERIOD_UPDATE)  {   //if-Abfrage funktioniert für mindestens 7 Wochen, dann Overflow möglich
+  if (millis() - ulLastupdate > PERIOD_UPDATE)  {   // if-Abfrage funktioniert für mindestens 7 Wochen, dann Overflow möglich
 
-    ulLastupdate = millis();  //Taktzähler zurücksetzen
+    ulLastupdate = millis();  // Taktzähler zurücksetzen
 
-    ReturnAcceleration();   //TEST
-
-    //Serial.print("Aktueller Zustand: ");
-    //Serial.println(Zustand);
+    ReturnAcceleration();   // TEST
 
     //Zustandswechsel hier
     switch(Zustand){
       
-
       case Start:
         // Alarm ausschalten
         analogWrite(PWM_PIN, 0);
         digitalWrite(PWM_PIN, 0); // safety first
         digitalWrite(SHDN_PIN, 0);      // Verstärker AUS
+
         //Sensoren und Aktoren Initialisieren
         bIR_Sensor_an = 0;
         bUS_Sensor_an = 0;
         bA_Sensor_an = 0;
+        bSensor_ausgeloest = 0;
+
         Zustand = Sensorauswahl;
         break;
       
       case Sensorauswahl:
-        //Diplay zeigt "Bereit"
-        // (Sensorvariablen lesen aus WebUI änderungen):
-        if(bIR_Sensor_an || bUS_Sensor_an || bA_Sensor_an){
+        // Display zeigt "Bereit"
+        // (Sensorvariablen werden durch WebUI gesetzt)
+        if (bIR_Sensor_an || bUS_Sensor_an || bA_Sensor_an) {
           ldistultraschallvgl = ReturnUltraschall();
           Zustand = Aktiv;
         }
-
-        
         break;
 
       case Aktiv:
-        if(bIR_Sensor_an){
-          //Sensor abfragen
+        if (bIR_Sensor_an) {
+          // Sensor abfragen
           bSensor_ausgeloest = ReturnInfrarot();
-
         }
-        if(bUS_Sensor_an){
-          //Sensor abfragen & auswerten
-          if ( ReturnUltraschall() - ldistultraschallvgl > 5 || ReturnUltraschall() - ldistultraschallvgl < -5 )  {
+        if (bUS_Sensor_an) {
+          // Sensor abfragen & auswerten
+          long dist = ReturnUltraschall();
+          if (dist - ldistultraschallvgl > 5 || dist - ldistultraschallvgl < -5)  {
             bSensor_ausgeloest = 1;
           }
-          
         }
-        if(bA_Sensor_an){
-          //Sensor abfragen
+        if (bA_Sensor_an) {
+          // Sensor abfragen
           bSensor_ausgeloest = ReturnAcceleration();
         }
 
-        if(bSensor_ausgeloest){
+        if (bSensor_ausgeloest) {
           Zustand = Alarm;
         }
         break;
 
       case Alarm:
-        //LED blinken, Lautsprecher aktivieren, Piezo aktivieren
-        //Web UI kann bSensor_ausgeloest auf 0 setzen
-
+        // LED blinken, Lautsprecher aktivieren, Piezo aktivieren
+        // Web UI kann bSensor_ausgeloest auf 0 setzen (z. B. später über extra Button)
         AlarmOutput();
 
-
-        if(!bSensor_ausgeloest){
+        if (!bSensor_ausgeloest) {
           Zustand = Start;
         }
         break;
 
       default:
-        //Nur zur Fehlerbehebung, immer zu Start wechseln
+        // Nur zur Fehlerbehebung, immer zu Start wechseln
         Zustand = Start;
         break;
-      }
+    }
   }
-    
     
   if (ulLastupdate > millis() ) {    //Bei Overflow: ulLastupdate neu setzen, um Takt wiederherzustellen
     ulLastupdate = millis();
   }
-  
-
 }
 
-// Funktionen hier
+/* =======================================================================
+ *  Funktionen: Alarm und Sensoren
+ * ======================================================================= */
 
-//LED blinken, Lautsprecher aktivieren, Piezo aktivieren
+// LED blinken, Lautsprecher aktivieren, Piezo aktivieren
 void AlarmOutput(){
 
-  volatile unsigned long takt = 0;
+  static unsigned long takt = 0;
   digitalWrite(SHDN_PIN, 1);      // Verstärker AN
 
-  if (takt % 2) digitalWrite(PIEZZO_PIN, 1);   // PIEZZEO AN
-  else digitalWrite(PIEZZO_PIN, 0);   // PIEZZEO AUS
+  if (takt % 2) digitalWrite(PIEZZO_PIN, 1);   // PIEZZO AN
+  else          digitalWrite(PIEZZO_PIN, 0);   // PIEZZO AUS
 
-  
   analogWrite(PWM_PIN, 50);      // 0-255: mitte am lautesten
  
-
   if (takt < 20){
-    digitalWrite(LED_PIN, 1);   // LED AN
-    
+    digitalWrite(LED_PIN, 1);    // LED AN
   }
   else if (takt < 40){
-    digitalWrite(LED_PIN, 0);   // LED AUS    
-
+    digitalWrite(LED_PIN, 0);    // LED AUS    
   }
   else {
     takt = 0;
   }
   
   takt++;
-
-
 }
+
+// Ultraschall – simple Beispielimplementierung
+long ReturnUltraschall() {
+  long d = ultrasonic.read();   // hängt von Bibliothek ab
+  // Serial.print("Ultraschall: "); Serial.println(d);
+  return d;
+}
+
+// Infrarot-Sensor – HIGH = ausgelöst
+bool ReturnInfrarot() {
+  int val = digitalRead(INFRAROT_PIN_NR);
+  return (val == HIGH);
+}
+
+// Beschleunigungssensor – Schwellwert-Beispiel
+bool ReturnAcceleration() {
+  float x, y, z;
+  if (IMU.accelerationAvailable()) {
+    IMU.readAcceleration(x, y, z);
+    // einfache Schwelle
+    if (fabs(x) > 0.5 || fabs(y) > 0.5 || fabs(z) > 0.5) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/* =======================================================================
+ *  WEB: Access Point + HTTP-Handler
+ * ======================================================================= */
 
 void WebServer_begin() {
 
@@ -310,7 +330,7 @@ void WebServer_handleClient() {
   }
 }
 
-// JSON-Status für den Browser
+/* JSON-Status für den Browser */
 void sendStatus(WiFiClient client) {
   client.println("HTTP/1.1 200 OK");
   client.println("Content-Type: application/json");
@@ -327,7 +347,7 @@ void sendStatus(WiFiClient client) {
   client.println(json);
 }
 
-// Web-App senden
+/* Web-App senden */
 void sendWebApp(WiFiClient client) {
   client.println("HTTP/1.1 200 OK");
   client.println("Content-Type: text/html");
