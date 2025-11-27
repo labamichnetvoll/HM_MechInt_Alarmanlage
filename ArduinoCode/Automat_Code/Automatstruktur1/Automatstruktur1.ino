@@ -20,6 +20,7 @@
 
 /* Konstanten */
 #define PERIOD_UPDATE 100   // Taktlänge in ms
+#define SENSI 0.01          // Sensitivity Beschleunigungssensor
 
 /* Variablen für Automaten */
 unsigned long ulLastupdate = 0;
@@ -37,8 +38,10 @@ bool bUS_Sensor_an = 0;
 bool bA_Sensor_an = 0;
 bool bSensor_ausgeloest = 0;
 
-/* globale Sensorvariable, codeintern */
-long ldistultraschallvgl = 0;
+/* globale Sensorvariablen, codeintern */
+long ldistultraschallvgl = 0;             //Vergleichs-Abstand für Ultraschallmessung
+float acc_x, acc_y, acc_z;                //aktuelle Beschleunigungswerte
+float acc_x_old, acc_y_old, acc_z_old;    //alte Beschleunigungswerte
 
 // Webserver / WLAN
 const char ssid[] = "ReiseAlarm_AP";     // Name des WLANs
