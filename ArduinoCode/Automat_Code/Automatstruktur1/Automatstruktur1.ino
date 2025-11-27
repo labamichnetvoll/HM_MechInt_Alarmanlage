@@ -40,8 +40,12 @@ bool bSensor_ausgeloest = 0;
 
 /* globale Sensorvariablen, codeintern */
 long ldistultraschallvgl = 0;             //Vergleichs-Abstand für Ultraschallmessung
-float acc_x, acc_y, acc_z;                //aktuelle Beschleunigungswerte
-float acc_x_old, acc_y_old, acc_z_old;    //alte Beschleunigungswerte
+float acc_x = 0;                          //aktuelle Beschleunigungswerte
+float acc_y = 0;
+float acc_z = 0;
+float acc_x_old = 0;                      //alte Beschleunigungswerte
+float acc_y_old = 0;
+float acc_z_old = 0;
 
 // Webserver / WLAN
 const char ssid[] = "ReiseAlarm_AP";     // Name des WLANs
@@ -201,12 +205,12 @@ void AlarmOutput(){
   if (takt < 200){
     digitalWrite(LED_PIN, 1);       // LED AN
     digitalWrite(PIEZZO_PIN, 1);    // PIEZZO AN
-    Serial.println(AN);             // Debug
+    Serial.println("AN");             // Debug
   }
   else if (takt < 400){
     digitalWrite(LED_PIN, 0);       // LED AUS    
     digitalWrite(PIEZZO_PIN, 0);    // PIEZZO AUS
-    Serial.println(AUS);            // Debug
+    Serial.println("AUS");            // Debug
   }
   else takt = 0;
   takt++;
