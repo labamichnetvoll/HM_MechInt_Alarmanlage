@@ -126,6 +126,8 @@ void loop() {
 
       case Start:
         // Alarm ausschalten
+        digitalWrite(LED_PIN, 0);       // LED AUS    
+        digitalWrite(PIEZZO_PIN, 0);    //Piezo AUS
         
         //Sensoren und Aktoren Initialisieren
         bIR_Sensor_an = 0;
@@ -167,6 +169,11 @@ void loop() {
         if(bSensor_ausgeloest){
           Zustand = Alarm;
         }
+        //Falls entschärft wird
+        if(!(bIR_Sensor_an||bUS_Sensor_an||bA_Sensor_an)){
+          Zustand = Start;
+          bSensor_ausgelöst = 0;
+        }
         break;
 
       case Alarm:
@@ -200,17 +207,17 @@ void loop() {
 void AlarmOutput(){
 
   static unsigned long takt = 0;
-  Serial.println(takt);
+  //Serial.println(takt);
   
   if (takt < 200){
     digitalWrite(LED_PIN, 1);       // LED AN
     digitalWrite(PIEZZO_PIN, 1);    // PIEZZO AN
-    Serial.println("AN");             // Debug
+    //Serial.println("AN");             // Debug
   }
   else if (takt < 400){
     digitalWrite(LED_PIN, 0);       // LED AUS    
     digitalWrite(PIEZZO_PIN, 0);    // PIEZZO AUS
-    Serial.println("AUS");            // Debug
+    //Serial.println("AUS");            // Debug
   }
   else takt = 0;
   takt++;
@@ -242,20 +249,20 @@ bool ReturnAcceleration() {
     IMU.readAcceleration(acc_x, acc_y, acc_z);
 
     if (acc_x - acc_x_old > SENSI || acc_x - acc_x_old < -SENSI) {
-      Serial.print("X:");
-      Serial.println(acc_x, 5);   //Debug-Text
+      //Serial.print("X:");
+      //Serial.println(acc_x, 5);   //Debug-Text
       acc_x_old = acc_x;
       return 1;
     }
     if (acc_y - acc_y_old > SENSI || acc_y - acc_y_old < -SENSI) {
-      Serial.print("Y:");
-      Serial.println(acc_y, 5);   //Debug-Text
+      //Serial.print("Y:");
+      //Serial.println(acc_y, 5);   //Debug-Text
       acc_y_old = acc_y;
       return 1;
     }
     if (acc_z - acc_z_old > SENSI || acc_z - acc_z_old < -SENSI) {
-      Serial.print("Z:");
-      Serial.println(acc_z, 5);   //Debug-Text
+      //Serial.print("Z:");
+      //Serial.println(acc_z, 5);   //Debug-Text
       acc_z_old = acc_z;
       return 1;
     }
