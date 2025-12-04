@@ -129,6 +129,7 @@ void loop() {
         // Alarm ausschalten
         digitalWrite(LED_PIN, 0);       // LED AUS    
         digitalWrite(PIEZZO_PIN, 0);    //Piezo AUS
+        dauer = 0;                      //Piepser-zähler reset
         
         //Sensoren und Aktoren Initialisieren
         bIR_Sensor_an = 0;
