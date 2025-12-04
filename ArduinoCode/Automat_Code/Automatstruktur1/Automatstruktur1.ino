@@ -144,7 +144,7 @@ void loop() {
         if (bIR_Sensor_an || bUS_Sensor_an || bA_Sensor_an) {
           ldistultraschallvgl = ReturnUltraschall();
           Zustand = Aktiv;
-          bSensor_ausgelöst = 0;
+          bSensor_ausgeloest = 0;
         }
         break;
 
@@ -173,7 +173,7 @@ void loop() {
         //Falls entschärft wird
         if(!(bIR_Sensor_an||bUS_Sensor_an||bA_Sensor_an)){
           Zustand = Start;
-          bSensor_ausgelöst = 0;
+          bSensor_ausgeloest = 0;
         }
         break;
 
