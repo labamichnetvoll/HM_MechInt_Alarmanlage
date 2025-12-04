@@ -40,6 +40,7 @@ bool bSensor_ausgeloest = 0;
 
 /* globale Sensorvariablen, codeintern */
 long ldistultraschallvgl = 0;             //Vergleichs-Abstand für Ultraschallmessung
+unsigned long dauer = 0;                  //zählt Anzahl der Piepser im Alarm
 float acc_x = 0;                          //aktuelle Beschleunigungswerte
 float acc_y = 0;
 float acc_z = 0;
@@ -153,6 +154,8 @@ void loop() {
         if(bIR_Sensor_an){
           //Sensor abfragen
           bSensor_ausgeloest = ReturnInfrarot();
+          //drift korrigieren
+
         }
         //Ultraschallsensor
         if(bUS_Sensor_an){
@@ -160,6 +163,11 @@ void loop() {
           if ( ReturnUltraschall() - ldistultraschallvgl > 5 || ReturnUltraschall() - ldistultraschallvgl < -5 )  {
             bSensor_ausgeloest = 1;
           }
+          //drift korrigieren
+          if (ReturnUltraschall() < ldistultraschallvgl){
+            ldistultraschallvgl--;
+          }
+          else ldistultraschallvgl++;
         }
         //Beschleunigungssensor
         if(bA_Sensor_an){
@@ -185,6 +193,7 @@ void loop() {
         if (!bSensor_ausgeloest) {
           Zustand = Start;
         }
+
         break;
 
       default:
@@ -206,21 +215,29 @@ void loop() {
 
 /* LED blinken, Piezo aktivieren */
 void AlarmOutput(){
-
-  static unsigned long takt = 0;
+  static unsigned int takt = 0;     //reset nach jedem Piepser
   //Serial.println(takt);
   
-  if (takt < 200){
+  if (dauer < 300 && takt < 4){
     digitalWrite(LED_PIN, 1);       // LED AN
     digitalWrite(PIEZZO_PIN, 1);    // PIEZZO AN
     //Serial.println("AN");             // Debug
   }
-  else if (takt < 400){
+  else if (dauer < 300 && takt < 6){
     digitalWrite(LED_PIN, 0);       // LED AUS    
     digitalWrite(PIEZZO_PIN, 0);    // PIEZZO AUS
     //Serial.println("AUS");            // Debug
   }
-  else takt = 0;
+  else if(takt < 4){                //Nach 300 Piepsern nur noch LED
+    digitalWrite(LED_PIN, 1);
+  }
+  else if(takt < 6){
+    digitalWrite(LED_PIN, 0);
+  }
+  else{
+    takt = 0;
+    dauer++;
+  }
   takt++;
 }
 
