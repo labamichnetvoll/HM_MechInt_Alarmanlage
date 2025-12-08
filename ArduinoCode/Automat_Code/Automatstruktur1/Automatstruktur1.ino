@@ -9,18 +9,28 @@
 #include <Arduino_LSM6DS3.h>       // IMU
 #include <SPI.h>                   // für WiFi
 #include <WiFiNINA.h>              // WLAN / Webserver
+#include <Adafruit_GFX.h>          // Display
+#include <Adafruit_SSD1306.h>      // Display
+#include <Wire.h>                  // I2C Display
 //#include "WebServer.h"           // Web Anteil - aktuell nicht benutzt
 
 /* PIN Nummer - Defintionen */
 //Auswahl Pins Interrupt: 2, 3, 9, 10, 11, 13, A1, A5, A7
-#define ULTRASONIC_PIN_NR 7     // evtl. anpassen! TODO   
-#define INFRAROT_PIN_NR 6       // evtl. anpassen! TODO
-#define LED_PIN 4               // Pin D4
-#define PIEZZO_PIN 5            // Pin D5 !! Vin benutzen, nicht 5V !!
+#define ULTRASONIC_PIN_NR 7        // evtl. anpassen! TODO   
+#define INFRAROT_PIN_NR 6          // evtl. anpassen! TODO
+#define LED_PIN 4                  // Pin D4
+#define PIEZZO_PIN 5               // Pin D5 !! Vin benutzen, nicht 5V !!
 
 /* Konstanten */
-#define PERIOD_UPDATE 100   // Taktlänge in ms
-#define SENSI 0.01          // Sensitivity Beschleunigungssensor
+#define PERIOD_UPDATE 100          // Taktlänge in ms
+#define SENSI 0.01                 // Sensitivity Beschleunigungssensor
+
+#define OLED_RESET 4               // ich hab keine Ahnung
+#define OLED_WIDTH 128             // Display Breite
+#define OLED_HEIGHT 64             // Display Höhe
+
+/* Display Init */
+Adafruit_SSD1306 display(OLED_WIDTH, OLED_HEIGHT, &Wire, OLED_RESET);
 
 /* Variablen für Automaten */
 unsigned long ulLastupdate = 0;
@@ -76,6 +86,20 @@ bool ReturnAcceleration();
  *  SETUP
  * ======================================================================= */
 void setup() {
+  /* Display Init */
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+
+  // Display zeigt "startet.."
+  display.clearDisplay();
+  display.setTextColor(WHITE);
+  display.setTextSize(1);
+  display.setCursor(18, 5);
+  display.println("Reisealarmanlage");
+  display.setTextSize(2);
+  display.setCursor(12, 31);
+  display.println("startet..");
+  display.display();
+
 
   Serial.begin(115200);
   //while (!Serial);          //TODO Später auskommentieren!
@@ -112,7 +136,6 @@ void setup() {
  *  LOOP
  * ======================================================================= */
 void loop() {
-  
   // HTTP-Anfragen vom Web-Client bearbeiten
   WebServer_handleClient();
   
@@ -142,6 +165,19 @@ void loop() {
       
       case Sensorauswahl:
         // Display zeigt "Bereit"
+        display.clearDisplay();
+        display.setTextColor(WHITE);
+        display.setTextSize(1);
+        display.setCursor(18, 5);
+        display.println("Reisealarmanlage");
+        display.setTextSize(2);
+        display.setCursor(34, 19);
+        display.println("Alarm");
+        display.setCursor(25, 40);
+        display.setTextSize(2);
+        display.println("Bereit!");
+        display.display();
+
         // (Sensorvariablen werden durch WebUI gesetzt)
         if (bIR_Sensor_an || bUS_Sensor_an || bA_Sensor_an) {
           ldistultraschallvgl = ReturnUltraschall();
@@ -151,7 +187,21 @@ void loop() {
         break;
 
       case Aktiv:
-      //Infrarotsensor
+        // Display zeigt "Aktiv"
+        display.clearDisplay();
+        display.setTextColor(WHITE);
+        display.setTextSize(1);
+        display.setCursor(18, 5);
+        display.println("Reisealarmanlage");
+        display.setTextSize(2);
+        display.setCursor(34, 19);
+        display.println("Alarm");
+        display.setCursor(31, 40);
+        display.setTextSize(2);
+        display.println("AKTIV!");
+        display.display();
+
+        //Infrarotsensor
         if(bIR_Sensor_an){
           //Sensor abfragen
           bSensor_ausgeloest = ReturnInfrarot();
@@ -189,7 +239,7 @@ void loop() {
       case Alarm:
         // LED blinken, Piezo aktivieren
         // Web UI kann bSensor_ausgeloest auf 0 setzen (z. B. später über extra Button)
-        AlarmOutput();
+        AlarmOutput(); 
 
         if (!bSensor_ausgeloest) {
           Zustand = Start;
@@ -223,17 +273,51 @@ void AlarmOutput(){
     digitalWrite(LED_PIN, 1);       // LED AN
     digitalWrite(PIEZZO_PIN, 1);    // PIEZZO AN
     //Serial.println("AN");             // Debug
+
+    // Display zeigt "ALARM!"
+    display.clearDisplay();
+    display.setTextColor(BLACK);
+    display.setTextSize(3);
+    display.setCursor(14, 20);
+    display.println("ALARM!");
+    display.display();
   }
   else if (dauer < 300 && takt < 6){
     digitalWrite(LED_PIN, 0);       // LED AUS    
     digitalWrite(PIEZZO_PIN, 0);    // PIEZZO AUS
     //Serial.println("AUS");            // Debug
+
+    // Display zeigt "ALARM!"
+    display.clearDisplay();
+    display.setTextColor(WHITE);
+    display.setTextSize(3);
+    display.setCursor(14, 20);
+    display.println("ALARM!");
+    display.display();
   }
-  else if(takt < 4){                //Nach 300 Piepsern nur noch LED
+  else if(takt < 4){                //Nach 300 Piepsern nur noch LED und Display
     digitalWrite(LED_PIN, 1);
+
+    // Display zeigt "ALARM!"
+    display.clearDisplay();
+    display.setTextColor(WHITE);
+    display.setTextSize(3);
+    display.setCursor(14, 20);
+    display.println("ALARM!");
+    display.display();
+    display.invertDisplay(true);
   }
   else if(takt < 6){
     digitalWrite(LED_PIN, 0);
+
+    // Display zeigt "ALARM!"
+    display.clearDisplay();
+    display.setTextColor(WHITE);
+    display.setTextSize(3);
+    display.setCursor(14, 20);
+    display.println("ALARM!");
+    display.display();
+    display.invertDisplay(false);
   }
   else{
     takt = 0;
