@@ -136,6 +136,7 @@ void setup() {
  *  LOOP
  * ======================================================================= */
 void loop() {
+  
   // HTTP-Anfragen vom Web-Client bearbeiten
   WebServer_handleClient();
   
@@ -300,12 +301,11 @@ void AlarmOutput(){
 
     // Display zeigt "ALARM!"
     display.clearDisplay();
-    display.setTextColor(WHITE);
+    display.setTextColor(BLACK);
     display.setTextSize(3);
     display.setCursor(14, 20);
     display.println("ALARM!");
     display.display();
-    display.invertDisplay(true);
   }
   else if(takt < 6){
     digitalWrite(LED_PIN, 0);
@@ -317,7 +317,6 @@ void AlarmOutput(){
     display.setCursor(14, 20);
     display.println("ALARM!");
     display.display();
-    display.invertDisplay(false);
   }
   else{
     takt = 0;
