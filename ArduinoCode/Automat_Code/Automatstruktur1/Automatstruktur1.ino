@@ -99,6 +99,7 @@ void setup() {
   display.setCursor(12, 31);
   display.println("startet..");
   display.display();
+  display.invertDisplay(false);
 
 
   Serial.begin(115200);
@@ -178,6 +179,7 @@ void loop() {
         display.setTextSize(2);
         display.println("Bereit!");
         display.display();
+        display.invertDisplay(false);
 
         // (Sensorvariablen werden durch WebUI gesetzt)
         if (bIR_Sensor_an || bUS_Sensor_an || bA_Sensor_an) {
@@ -201,6 +203,7 @@ void loop() {
         display.setTextSize(2);
         display.println("AKTIV!");
         display.display();
+        display.invertDisplay(false);
 
         //Infrarotsensor
         if(bIR_Sensor_an){
@@ -277,11 +280,12 @@ void AlarmOutput(){
 
     // Display zeigt "ALARM!"
     display.clearDisplay();
-    display.setTextColor(BLACK);
+    display.setTextColor(WHITE);
     display.setTextSize(3);
     display.setCursor(14, 20);
     display.println("ALARM!");
     display.display();
+    display.invertDisplay(true);
   }
   else if (dauer < 300 && takt < 6){
     digitalWrite(LED_PIN, 0);       // LED AUS    
@@ -295,17 +299,19 @@ void AlarmOutput(){
     display.setCursor(14, 20);
     display.println("ALARM!");
     display.display();
+    display.invertDisplay(false);
   }
   else if(takt < 4){                //Nach 300 Piepsern nur noch LED und Display
     digitalWrite(LED_PIN, 1);
 
     // Display zeigt "ALARM!"
     display.clearDisplay();
-    display.setTextColor(BLACK);
+    display.setTextColor(WHTIE);
     display.setTextSize(3);
     display.setCursor(14, 20);
     display.println("ALARM!");
     display.display();
+    display.invertDisplay(true);
   }
   else if(takt < 6){
     digitalWrite(LED_PIN, 0);
@@ -317,6 +323,7 @@ void AlarmOutput(){
     display.setCursor(14, 20);
     display.println("ALARM!");
     display.display();
+    display.invertDisplay(false);
   }
   else{
     takt = 0;
