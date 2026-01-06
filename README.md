@@ -1,4 +1,4 @@
-# Projekt Alarmanlage Stand 27.11.23
+# Projekt Alarmanlage Stand 06.01.26
 > [!NOTE]
 > [Aktuelle Doku HIER!](https://github.com/labamichnetvoll/HM_MechInt_Alarmanlage/tree/doku_github)
 
@@ -6,16 +6,19 @@
 Dieses GitHub Repository dient als Code Austausch Plattform
 
 > [!IMPORTANT]
-> Bitte nur noch im [`final_candidat`](https://github.com/labamichnetvoll/HM_MechInt_Alarmanlage/tree/final_candidat) branch arbeiten  
+> Die Bearbeitung des Codes für die Abgabe im Branch [`final_candidat`](https://github.com/labamichnetvoll/HM_MechInt_Alarmanlage/tree/final_candidat) ist abgeschlossen.
+> Weitere Änderungen bitte nur nach Absprache im Team.  
 > Mit Außnahme der Doku bzw. des Schaltplans in dem jeweiligen Branch
 
+> [!NOTE]
+> Der Branch [`final_candidat`](https://github.com/labamichnetvoll/HM_MechInt_Alarmanlage/tree/final_candidat) ist in `main` gemerged.
 
 ## Branches:
 
 | Branch                  | Kurzbeschreibung                                              | Bemerkung |
 | ---                     | ---                                                           | ---       |
 | `main`                  | Hier werden alle Änderungen nach und nach eingebettet         | 
-| <mark>`final_candidat`  | <mark> Finalisierung des Codes, alles zusammen                | <mark>**NUR hier Arbeiten**</mark>
+| `final_candidat`  |  Finalisierung des Codes, alles zusammen                | **Bearbeitung abgeschlossen**
 | `DEV_Sensorik`          | Entwicklungsbranch für die Sensorik-Programmierung            | abgeschlossen
 | `Leoline99-patch-2`     | Programlogik                                                  | nicht mehr up-to-date
 | `dev_Schaltplan`        | Schaltplan Erstellung mit KiCAD v9.0.5 als Bauanleitung       | 
