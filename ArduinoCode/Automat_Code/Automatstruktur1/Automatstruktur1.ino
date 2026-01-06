@@ -136,6 +136,8 @@ void setup() {
 
   /* IO-Init */
   pinMode(INFRAROT_PIN_NR, INPUT);
+  digitalWrite(LED_PIN, 0);       // LED AUS    
+  digitalWrite(PIEZZO_PIN, 0);    //Piezo AUS
   pinMode(LED_PIN, OUTPUT);
   pinMode(PIEZZO_PIN, OUTPUT);
 
