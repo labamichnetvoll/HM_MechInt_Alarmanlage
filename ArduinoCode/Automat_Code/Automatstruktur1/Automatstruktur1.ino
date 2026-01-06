@@ -23,7 +23,7 @@
 
 /* Konstanten */
 #define PERIOD_UPDATE 100          // Taktlänge in ms
-#define SENSI 0.01                 // Sensitivity Beschleunigungssensor
+#define SENSI 0.05                 // Sensitivity Beschleunigungssensor
 
 #define OLED_RESET 4               // Display Reset
 #define OLED_WIDTH 128             // Display Breite
