@@ -23,7 +23,7 @@
 
 /* Konstanten */
 #define PERIOD_UPDATE 100          // Taktlänge in ms
-#define SENSI 0.05                 // Sensitivity Beschleunigungssensor
+#define SENSI 0.07                 // Sensitivity Beschleunigungssensor
 
 #define OLED_RESET 4               // Display Reset
 #define OLED_WIDTH 128             // Display Breite
@@ -76,6 +76,7 @@ bool bSensor_ausgeloest = 0;
 
 /* globale Sensorvariablen, codeintern */
 long ldistultraschallvgl = 0;             //Vergleichs-Abstand für Ultraschallmessung
+long ldistultraschallAktuell = 0;         //Aktueller Abstand der Ultraschallmessung
 unsigned long dauer = 0;                  //zählt Anzahl der Piepser im Alarm / wird für das Blinken des QR-Codes missbraucht
 float acc_x = 0;                          //aktuelle Beschleunigungswerte
 float acc_y = 0;
@@ -253,14 +254,14 @@ void loop() {
         //Ultraschallsensor
         if(bUS_Sensor_an){
           //Sensor abfragen & auswerten
-          if ( ReturnUltraschall() - ldistultraschallvgl > 20 || ReturnUltraschall() - ldistultraschallvgl < -20 )  {
+          ldistultraschallAktuell = ReturnUltraschall();
+          if ( ldistultraschallAktuell - ldistultraschallvgl > 10 || ldistultraschallAktuell - ldistultraschallvgl < -10 )  {
             bSensor_ausgeloest = 1;
           }
           //drift korrigieren
-          if (ReturnUltraschall() < ldistultraschallvgl){
-            ldistultraschallvgl--;
+          if (ldistultraschallAktuell != ldistultraschallvgl){
+            ldistultraschallvgl = ldistultraschallAktuell;
           }
-          else ldistultraschallvgl++;
         }
         //Beschleunigungssensor
         if(bA_Sensor_an){
