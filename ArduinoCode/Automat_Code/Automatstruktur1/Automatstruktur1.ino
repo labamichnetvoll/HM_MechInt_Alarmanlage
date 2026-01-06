@@ -29,34 +29,8 @@
 #define OLED_WIDTH 128             // Display Breite
 #define OLED_HEIGHT 64             // Display Höhe
 
-/* Display Init und QR-Code*/
+/* Display Init */
 Adafruit_SSD1306 display(OLED_WIDTH, OLED_HEIGHT, &Wire, OLED_RESET);
-const unsigned char qrCode[] PROGMEM = {
-  0b00000000, 0b00000011, 0b11110011, 0b00111100, 0b00110000, 0b00000000, 0b00000000, 0b00000000, 0b11111100, 0b11001111, 0b00001100, 0b00000000, 0b00000011, 0b11111111,
-0b00110011, 0b00111100, 0b11000011, 0b00111111, 0b11110000, 0b11111111, 0b11001100, 0b11001111, 0b00110000, 0b11001111, 0b11111100, 0b00110000, 0b00110011, 0b11111111, 
-0b00001111, 0b11110011, 0b00000011, 0b00001100, 0b00001100, 0b11111111, 0b11000011, 0b11111100, 0b11000000, 0b11000011, 0b00000011, 0b00110000, 0b00110000, 0b00001111, 
-0b00110000, 0b00110000, 0b11000000, 0b11001100, 0b00001100, 0b00000011, 0b11001100, 0b00001100, 0b00110000, 0b00110011, 0b11001111, 0b11111111, 0b00110011, 0b00000011, 
-0b00001100, 0b00001100, 0b11110011, 0b11111111, 0b11001100, 0b11000000, 0b11000011, 0b11111111, 0b00110000, 0b11000000, 0b11111111, 0b00111111, 0b11110000, 0b11111111, 
-0b11001100, 0b00110000, 0b00111111, 0b11001111, 0b11111100, 0b00000000, 0b00000011, 0b00110011, 0b00110011, 0b00110000, 0b00000000, 0b00000000, 0b00000000, 0b11001100, 
-0b11001100, 0b11001100, 0b00000000, 0b00001111, 0b11111111, 0b11111100, 0b00001111, 0b00111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b00000011, 0b11001111, 
-0b11111111, 0b11111111, 0b00000000, 0b00110000, 0b00001100, 0b11111100, 0b11001100, 0b11001100, 0b11000000, 0b00001100, 0b00000011, 0b00111111, 0b00110011, 0b00110011, 
-0b00111111, 0b11001100, 0b11001111, 0b00110011, 0b00001100, 0b00111111, 0b11110011, 0b11110011, 0b00110011, 0b11001100, 0b11000011, 0b00001111, 0b11111100, 0b11001111, 
-0b11000011, 0b00110011, 0b11001111, 0b00110000, 0b00110011, 0b11110011, 0b11110000, 0b11001100, 0b11110011, 0b11001100, 0b00001100, 0b11111111, 0b11000011, 0b11111111, 
-0b11110000, 0b11111100, 0b11111111, 0b11111111, 0b11110000, 0b11111111, 0b11111100, 0b00111111, 0b00111111, 0b11111111, 0b11001111, 0b11000000, 0b00000011, 0b00000000, 
-0b11111100, 0b00001100, 0b00110011, 0b11110000, 0b00000000, 0b11000000, 0b00111111, 0b00000011, 0b00000000, 0b11001111, 0b11000000, 0b11111111, 0b00110000, 0b00000011, 
-0b11001100, 0b00110011, 0b11110000, 0b00111111, 0b11001100, 0b00000000, 0b11110011, 0b00110011, 0b00110011, 0b00001100, 0b00111100, 0b00110011, 0b00110011, 0b00001100, 
-0b11001100, 0b11000011, 0b00001111, 0b00001100, 0b11001100, 0b11000011, 0b11000011, 0b11110000, 0b11001111, 0b11111100, 0b11111111, 0b11000000, 0b11110000, 0b11111100, 
-0b00110011, 0b11111111, 0b00111111, 0b11110000, 0b00110000, 0b11000000, 0b00001100, 0b11111100, 0b00000000, 0b00001111, 0b00001100, 0b00110000, 0b00000011, 0b00111111, 
-0b00000000, 0b00000011, 0b11001111, 0b11111111, 0b11110011, 0b00110000, 0b11110011, 0b11110011, 0b11110011, 0b11111111, 0b11111100, 0b11001100, 0b00111100, 0b11111100, 
-0b11111100, 0b00000000, 0b00000011, 0b00110011, 0b11000000, 0b00110011, 0b00110000, 0b00000000, 0b00000000, 0b11001100, 0b11110000, 0b00001100, 0b11001100, 0b00000011, 
-0b11111111, 0b00111111, 0b00110000, 0b11000011, 0b11110000, 0b11111100, 0b11111111, 0b11001111, 0b11001100, 0b00110000, 0b11111100, 0b00111111, 0b00110000, 0b00110011, 
-0b00000011, 0b00110000, 0b00000000, 0b00001111, 0b11001100, 0b00001100, 0b11000000, 0b11001100, 0b00000000, 0b00000011, 0b11110011, 0b00000011, 0b00110000, 0b11111111, 
-0b11110011, 0b00000000, 0b11000000, 0b11000000, 0b11001100, 0b00111111, 0b11111100, 0b11000000, 0b00110000, 0b00110000, 0b00110011, 0b00000000, 0b00111100, 0b11111100, 
-0b00110011, 0b00001100, 0b00001100, 0b11000000, 0b00001111, 0b00111111, 0b00001100, 0b11000011, 0b11111111, 0b00110011, 0b11001111, 0b00000011, 0b00110000, 0b00001100, 
-0b11111111, 0b11001100, 0b11110011, 0b11000000, 0b11001100, 0b00000011, 0b00000000, 0b00000011, 0b00111100, 0b11111111, 0b00111111, 0b11000000, 0b00000000, 0b00000000, 
-0b11001111, 0b00111111, 0b11001111, 0b11110000, 0b0000
-};
-    //Array mit QR-Code Grafik NICHT FUNKTIONAL TODO
 
 /* Variablen für Automaten */
 unsigned long ulLastupdate = 0;
@@ -77,7 +51,7 @@ bool bSensor_ausgeloest = 0;
 /* globale Sensorvariablen, codeintern */
 long ldistultraschallvgl = 0;             //Vergleichs-Abstand für Ultraschallmessung
 long ldistultraschallAktuell = 0;         //Aktueller Abstand der Ultraschallmessung
-unsigned long dauer = 0;                  //zählt Anzahl der Piepser im Alarm / wird für das Blinken des QR-Codes missbraucht
+unsigned long dauer = 0;                  //zählt Anzahl der Piepser im Alarm
 float acc_x = 0;                          //aktuelle Beschleunigungswerte
 float acc_y = 0;
 float acc_z = 0;
@@ -103,7 +77,6 @@ void WebServer_begin();
 void WebServer_handleClient();
 void sendStatus(WiFiClient client);
 void sendWebApp(WiFiClient client);
-void displayQRcodeAnzeigen();
 
 // Sensor-Funktionen – hier als Prototypen, unten implementiert:
 long ReturnUltraschall();
@@ -196,31 +169,20 @@ void loop() {
         break;
       
       case Sensorauswahl:
-        //QR-Code und "Bereit" im Wechsel
-        if(dauer <= 15){
-          // Display zeigt "Bereit"
-          display.clearDisplay();
-          display.setTextColor(WHITE);
-          display.setTextSize(1);
-          display.setCursor(18, 5);
-          display.println("Reisealarmanlage");
-          display.setTextSize(2);
-          display.setCursor(34, 19);
-          display.println("Alarm");
-          display.setCursor(25, 40);
-          display.setTextSize(2);
-          display.println("Bereit!");
-          display.display();
-          display.invertDisplay(false);
-        }
-        else if(dauer <= 45){
-          // Display zeigt QR-Code
-          displayQRcodeAnzeigen();
-          display.display();
-
-        }
-        else dauer = 0;
-        dauer++;
+        // Display zeigt "Bereit"
+        display.clearDisplay();
+        display.setTextColor(WHITE);
+        display.setTextSize(1);
+        display.setCursor(18, 5);
+        display.println("Reisealarmanlage");
+        display.setTextSize(2);
+        display.setCursor(34, 19);
+        display.println("Alarm");
+        display.setCursor(25, 40);
+        display.setTextSize(2);
+        display.println("Bereit!");
+        display.display();
+        display.invertDisplay(false);
 
         // (Sensorvariablen werden durch WebUI gesetzt)
         if (bIR_Sensor_an || bUS_Sensor_an || bA_Sensor_an) {
@@ -641,11 +603,4 @@ window.addEventListener('load', ladeStatus);
 </body>
 </html>
 )rawliteral");
-}
-
-void displayQRcodeAnzeigen(){
-  
-  display.clearDisplay();
-  display.drawBitmap(0, 0, qrCode, 49, 49, WHITE);  //51, 19 ;; 25, 25
-
 }
