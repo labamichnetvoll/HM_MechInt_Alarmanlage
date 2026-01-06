@@ -253,7 +253,7 @@ void loop() {
         //Ultraschallsensor
         if(bUS_Sensor_an){
           //Sensor abfragen & auswerten
-          if ( ReturnUltraschall() - ldistultraschallvgl > 5 || ReturnUltraschall() - ldistultraschallvgl < -5 )  {
+          if ( ReturnUltraschall() - ldistultraschallvgl > 20 || ReturnUltraschall() - ldistultraschallvgl < -20 )  {
             bSensor_ausgeloest = 1;
           }
           //drift korrigieren
